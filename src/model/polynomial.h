@@ -3,7 +3,7 @@
 
 
 
-class polynomial {
+class Polynomial {
 
 };
 

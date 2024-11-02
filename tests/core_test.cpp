@@ -1,5 +1,6 @@
-#include "core/processing_input.h"
 #include <gtest/gtest.h>
+#include "core/processing_input.h"
+
 
 TEST(processing_input_cases, split_number_into_digits) {
     ASSERT_EQ(split_number_into_digits(10), (std::vector<int8_t> {1, 0}));

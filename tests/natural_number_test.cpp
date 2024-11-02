@@ -1,5 +1,4 @@
-#include "gtest/gtest.h"
-#include "model/natural_number.h"
+#include <gtest/gtest.h>
 
 class NaturalNumberTest : public ::testing::Test {
 protected:
