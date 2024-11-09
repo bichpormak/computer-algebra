@@ -55,9 +55,13 @@ std::unique_ptr<Number> NaturalNumber::multiply_by_ten_in_power(int64_t power) c
 }
 
 std::unique_ptr<Number> NaturalNumber::subtract_with_multiply_digit(NaturalNumber& other, int64_t digit) const {
+    std::unique_ptr<Number> multiplied = other.multiply_by_digit(digit);
 
-    return nullptr;
+    std::unique_ptr<Number> result = this->subtract(*multiplied);
+
+    return result;
 }
+
 std::unique_ptr<Number> NaturalNumber::get_first_digit_after_division_number_on_ten_in_power(int64_t power) const {
 
     return nullptr;
