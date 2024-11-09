@@ -17,7 +17,7 @@ public:
     std::unique_ptr<Number> get_absolute_value() const override;
     std::unique_ptr<Number> change_sign() const override;
 
-    uint8_t IntegerNumber::compare_integer(Number& other) const;
+    int8_t IntegerNumber::compare_integer(Number& other) const;
     int8_t is_number_positive() const;
     std::unique_ptr<Number> converting_natural_to_integer() const;
     std::unique_ptr<Number> converting_positive_integer_to_natural() const;
