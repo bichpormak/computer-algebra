@@ -30,8 +30,8 @@ public:
     std::unique_ptr<Number> get_first_digit_after_division_number_on_ten_in_power(int64_t digit) const;
     std::unique_ptr<Number> division_numbers_with_remainder(NaturalNumber& other) const;
     std::unique_ptr<Number> calculating_remainder_after_division(NaturalNumber& other) const;
-    uint64_t calculate_NOD(NaturalNumber& other) const;
-    uint64_t calculate_NOK(NaturalNumber& other) const;
+    std::unique_ptr<Number> calculate_gcd(NaturalNumber& other) const;
+    std::unique_ptr<Number> calculate_lcm(NaturalNumber& other) const;
 };
 
 

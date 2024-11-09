@@ -65,20 +65,45 @@ std::unique_ptr<Number> NaturalNumber::get_first_digit_after_division_number_on_
 
 std::unique_ptr<Number> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
 
+
+
     return nullptr;
 }
 
 std::unique_ptr<Number> NaturalNumber::calculating_remainder_after_division(NaturalNumber& other) const {
 
+    std::unique_ptr<Number> incomplete_quotient = division_numbers_with_remainder(other);
+
+    return subtract_with_multiply_digit(other, incomplete_quotient->get_number());
+
+}
+
+std::unique_ptr<Number> NaturalNumber::calculate_gcd(NaturalNumber& other) const {
+
+    auto firstNumber = *this;
+    auto secondNumber = other;
+
+    while (!secondNumber.is_zero()) {
+
+        std::unique_ptr<Number> remainder_ptr = firstNumber.calculating_remainder_after_division(secondNumber);
+        NaturalNumber* remainder = dynamic_cast<NaturalNumber*>(remainder_ptr.get());
+
+        if (firstNumber.compare(secondNumber) == 2) {
+            firstNumber = secondNumber;
+            secondNumber = *remainder;
+        } else if (firstNumber.compare(secondNumber) == 1) {
+            secondNumber = firstNumber;
+            firstNumber = *remainder;
+        } else {
+            break;
+        }
+    }
+
+    return std::make_unique<NaturalNumber>(firstNumber);
+
+}
+
+std::unique_ptr<Number> NaturalNumber::calculate_lcm(NaturalNumber& other) const {
+
     return nullptr;
-}
-
-uint64_t NaturalNumber::calculate_NOD(NaturalNumber& other) const {
-
-    return 0;
-}
-
-uint64_t NaturalNumber::calculate_NOK(NaturalNumber& other) const {
-
-    return 0;
 }

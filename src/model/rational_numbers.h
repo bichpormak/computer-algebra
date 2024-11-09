@@ -8,7 +8,7 @@
 class RationalNumber {
 private:
     // IntegerNumber& numerator_integer_number_;
-    // NaturalNumber& denomirator_natural_number_;
+    // NaturalNumber& denominator_natural_number_;
 
 
 };
