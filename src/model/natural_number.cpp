@@ -1,29 +1,30 @@
 #include "natural_number.h"
 
 std::unique_ptr<Number> NaturalNumber::add(Number &other) const {
-    auto num1 = this->get_digits_of_number();// сохранение цифр первого числа 
+    auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
-    if (this->compare(static_cast<NaturalNumber &>(other)) == 1){ // поиск большего числа 
+    if (this->compare(dynamic_cast<NaturalNumber &>(other)) == 1){ //finding a larger number
         auto tmp = num2;
         num2 = num1;
         num1 = tmp;
     };
-    std::reverse(num1.begin(), num1.end()); // разворот большего числа 
-    std::reverse(num2.begin(), num2.end());
+    num1 = reverse_digits_in_vector(num1); // reversal of a larger number 
+    num2 = reverse_digits_in_vector(num2);
     for (size_t k = 0; k < num2.size(); ++k){ 
 
-        num1[k] += num2[k]; // поразрядовое сложение цифр
-        if (num1[k] >= 10 && k + 1 < num1.size()){ // случай, когда при сложении разрядов получилось число, которое больше 10. При этом это не максимальный разраяд
+        num1[k] += num2[k]; // bitwise addition of digits
+        if (num1[k] >= 10 && k + 1 < num1.size()){ // the result of adding is greater than 10. Moreover, this is not the maximum digit
             num1[k + 1] += 1;
             num1[k] -= 10;
         }
-        else if(num1[k] >= 10 && k + 1 == num1.size()){ // случай, когда при сложении разрядов получилось число, которое больше 10. При этом это максимальный разраяд
+        else if(num1[k] >= 10 && k + 1 == num1.size()){ //  the result of adding is greater than 10. Moreover, this is the maximum digit
             num1.emplace_back(1);
             num1[k] -= 10;
         }
     }
-    std::reverse(num1.begin(), num1.end()); // разворот числа 
-    return std::make_unique<Number>((gather_digits_into_number(num1)));
+    num1 = reverse_digits_in_vector(num1); 
+    
+    return std::make_unique<NaturalNumber>((gather_digits_into_number(num1)));
     
 }
 
@@ -33,21 +34,27 @@ std::unique_ptr<Number> NaturalNumber::subtract(Number &other) const {
 }
 
 std::unique_ptr<Number> NaturalNumber::multiply(Number &other) const {
-    auto num1 = this->get_digits_of_number();// сохранение цифр первого числа 
+    auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
+
     std::unique_ptr<NaturalNumber> result = std::make_unique<NaturalNumber>(0);
 
-    std::reverse(num1.begin(), num1.end());
-    std::reverse(num2.begin(), num2.end());
-    std::unique_ptr<NaturalNumber> tmp = std::make_unique<NaturalNumber>(gather_digits_into_number(num1));
-    
-    for (size_t k = 0; k < num2.size(); ++k){ // проход по цифрам множетеля
-        tmp->multiply_by_digit(num2[k]);
-        result->add(tmp->multiply_by_ten_in_power(k));
-        
-    }
+    num2 = reverse_digits_in_vector(num2);
 
-    return std::make_unique<Number>(gather_digits_into_number(result->get_digits_of_number()));
+    std::unique_ptr<NaturalNumber> tmp = std::make_unique<NaturalNumber>(gather_digits_into_number(num1));
+
+    for (size_t k = 0; k < num2.size(); ++k) {
+        auto partial_product = tmp->multiply_by_digit(num2[k]);
+
+        auto shifted_product_ptr = dynamic_cast<NaturalNumber*>(partial_product.get());
+
+        auto shifted_product = shifted_product_ptr->multiply_by_ten_in_power(k);
+
+        result = std::unique_ptr<NaturalNumber>(dynamic_cast<NaturalNumber*>(result->add(*shifted_product).release()));
+    }
+    
+    return result;
+
 }
 
 std::unique_ptr<Number> NaturalNumber::divide(Number &other) const {
@@ -66,16 +73,16 @@ std::unique_ptr<Number> NaturalNumber::change_sign() const {
 }
 
 uint8_t NaturalNumber::compare(NaturalNumber &other) const {
-    auto num1 = this->get_digits_of_number(); // сохранение цифр первого числа 
+    auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
     int result = 0; 
-    if (num1.size() > num2.size()){ // сравнение, если количество разрядов в первом числе больше количества разрядов во втором
+    if (num1.size() > num2.size()){ // if the number of digits in the first number is greater than the number of digits in the second, then the first number is greater than the second
         result = 2;
     }
-    else if (num1.size() < num2.size()){ // сравнение, если количество разрядов в первом числе меньше количества разрядов во втором
+    else if (num1.size() < num2.size()){ // if the number of digits in the first number is less than the number of digits in the second, then the second number is greater
         result = 1;
     }
-    else{ // поразрядовое сравнение, если количетсво разрядов совпадает
+    else{ // bitwise comparison, if the number of bits matches
         for (size_t i = 0; i < num1.size(); ++i){
             if(num1[i] > num2[i]){
                 result = 2;
