@@ -7,7 +7,9 @@ std::unique_ptr<Number> IntegerNumber::add(Number& other) const {
 
 std::unique_ptr<Number> IntegerNumber::subtract(Number& other) const {
 
-    return nullptr;
+    int64_t result = this->get_number() - other.get_number();
+
+    return std::make_unique<IntegerNumber>(result);
 }
 
 std::unique_ptr<Number> IntegerNumber::multiply(Number& other) const {
@@ -31,8 +33,15 @@ std::unique_ptr<Number> IntegerNumber::change_sign() const {
 }
 
 int8_t IntegerNumber::is_number_positive() const {
+    if (get_number() > 0) {
+        return 2;
 
-    return 0;
+    } else if (get_number() == 0) {
+        return 0; 
+
+    } else {
+        return 1; 
+    }
 }
 
 std::unique_ptr<Number> IntegerNumber::converting_natural_to_integer() const {
