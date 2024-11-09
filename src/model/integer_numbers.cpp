@@ -1,7 +1,7 @@
 #include "integer_numbers.h"
 
 
-uint8_t IntegerNumber::compare_integer(Number& other) const { // = Z2
+int8_t IntegerNumber::compare_integer(Number& other) const { // = Z2
     const std::vector<uint8_t>& digits1 = this->get_digits_of_number();
     const std::vector<uint8_t>& digits2 = other.get_digits_of_number();
 
