@@ -37,3 +37,10 @@ SignNumber determining_sign_number(int64_t input_number) {
     }
 
 }
+int64_t gather_digits_into_number(std::vector<uint8_t> digits_of_number){
+    int64_t result = 0;
+    for (size_t i = 0; i < digits_of_number.size(); ++i){
+        result += digits_of_number[i] * std::pow(10, i); 
+    }
+    return result;
+}

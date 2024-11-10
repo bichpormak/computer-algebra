@@ -16,5 +16,5 @@ enum class SignNumber {
 std::vector<uint8_t> split_number_into_digits(int64_t input_number);
 std::vector<uint8_t> reverse_digits_in_vector(std::vector<uint8_t> digits_of_number);
 SignNumber determining_sign_number(int64_t input_number);
-
+int64_t gather_digits_into_number(std::vector<uint8_t> digits_of_number);
 #endif

@@ -27,12 +27,12 @@ TEST_F(NaturalNumberTest, is_zero) {
 }
 
 TEST_F(NaturalNumberTest, compare) {
-    EXPECT_EQ(num_small_->compare(*num_large_), -1);
-    EXPECT_EQ(num_large_->compare(*num_small_), 1);
+    EXPECT_EQ(num_small_->compare(*num_large_), 1);
+    EXPECT_EQ(num_large_->compare(*num_small_), 2);
     EXPECT_EQ(num_small_->compare(*num_small_), 0);
     EXPECT_EQ(num_zero_->compare(*num_zero_), 0);
-    EXPECT_EQ(num_zero_->compare(*num_small_), -1);
-    EXPECT_EQ(num_small_->compare(*num_zero_), 1);
+    EXPECT_EQ(num_zero_->compare(*num_small_), 1);
+    EXPECT_EQ(num_small_->compare(*num_zero_), 2);
 }
 
 TEST_F(NaturalNumberTest, add_one) {
@@ -77,14 +77,18 @@ TEST_F(NaturalNumberTest, divide) {
     EXPECT_EQ(natQuotient->get_digits_of_number(), (std::vector<uint8_t>{2, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
-TEST_F(NaturalNumberTest, calculate_NOD) {
-    auto nod = num_small_->calculate_NOD(*num_large_);
-    EXPECT_EQ(nod, 5);
+TEST_F(NaturalNumberTest, calculate_gcd) {
+    auto gcd = num_small_->calculate_gcd(*num_large_);
+    auto* natGcd = dynamic_cast<NaturalNumber*>(gcd.get());
+    ASSERT_NE(natGcd, nullptr);
+    EXPECT_EQ(natGcd->get_number(), 5);
 }
 
-TEST_F(NaturalNumberTest, calculate_NOK) {
-    auto nok = num_small_->calculate_NOK(*num_large_);
-    EXPECT_EQ(nok, 10000000000);
+TEST_F(NaturalNumberTest, calculate_lcm) {
+    auto lcm = num_small_->calculate_lcm(*num_large_);
+    auto* natLcm = dynamic_cast<NaturalNumber*>(lcm.get());
+    ASSERT_NE(natLcm, nullptr);
+    EXPECT_EQ(natLcm->get_number(), 10000000000);
 }
 
 TEST_F(NaturalNumberTest, multiply_by_ten_in_power) {
@@ -145,7 +149,7 @@ TEST_F(NaturalNumberTest, calculating_remainder_after_division) {
     ASSERT_NE(natRemainder, nullptr);
     EXPECT_TRUE(natRemainder->is_zero());
 
-        auto remainder_non_zero = num_large_->calculating_remainder_after_division(*num_three_);
+    auto remainder_non_zero = num_large_->calculating_remainder_after_division(*num_three_);
     auto* natRemainderNonZero = dynamic_cast<NaturalNumber*>(remainder_non_zero.get());
     ASSERT_NE(natRemainderNonZero, nullptr);
     EXPECT_EQ(natRemainderNonZero->get_digits_of_number(), std::vector<uint8_t>{1});

@@ -26,6 +26,7 @@ add_library(computer_algebra_lib
         src/model/polynomial.cpp
         src/core/processing_input.h
         src/core/processing_input.cpp
+
 )
 
 target_include_directories(computer_algebra_lib PUBLIC
