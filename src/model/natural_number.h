@@ -31,7 +31,7 @@ public:
     std::unique_ptr<Number> division_numbers_with_remainder(NaturalNumber& other) const;
     std::unique_ptr<Number> calculating_remainder_after_division(NaturalNumber& other) const;
     std::unique_ptr<Number> calculate_gcd(NaturalNumber& other) const;
-    std::unique_ptr<Number> calculate_lcm(NaturalNumber& other) const;
+    std::unique_ptr<Number> calculate_lcm(NaturalNumber& other);
 };
 
 
