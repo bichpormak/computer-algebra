@@ -8,7 +8,7 @@ std::unique_ptr<Number> NaturalNumber::add(Number &other) const {
         num2 = num1;
         num1 = tmp;
     };
-    num1 = reverse_digits_in_vector(num1); // reversal of a larger number 
+    num1 = reverse_digits_in_vector(num1); // reversal of a larger number
     num2 = reverse_digits_in_vector(num2);
     for (size_t k = 0; k < num2.size(); ++k){ 
 
@@ -84,6 +84,7 @@ std::unique_ptr<Number> NaturalNumber::multiply(Number &other) const {
 
 std::unique_ptr<Number> NaturalNumber::divide(Number &other) const {
 
+
     return nullptr;
 }
 
@@ -156,8 +157,21 @@ std::unique_ptr<Number> NaturalNumber::get_first_digit_after_division_number_on_
 }
 
 std::unique_ptr<Number> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
-
-
+    auto num1 = this->get_digits_of_number();
+    auto num2 = other.get_digits_of_number();
+    if (this->compare(dynamic_cast<NaturalNumber &>(other)) == 1){ //finding a larger number
+        auto tmp = num2;
+        num2 = num1;
+        num1 = tmp;
+    };
+    int k;
+    k=(num1.size())-(num2.size());
+    if (num1[0]<num2[0]){
+     k--;
+    }
+    std::unique_ptr<NaturalNumber> result = std::make_unique<NaturalNumber>(int(num1[0])/int(num2[0]));
+    result->multiply_by_ten_in_power(k);
+    return result;
 
     return nullptr;
 }
