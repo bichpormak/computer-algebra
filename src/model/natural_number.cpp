@@ -29,8 +29,33 @@ std::unique_ptr<Number> NaturalNumber::add(Number &other) const {
 }
 
 std::unique_ptr<Number> NaturalNumber::subtract(Number &other) const {
+    auto digits_first = this->get_digits_of_number();
+    auto digits_second = other.get_digits_of_number();
 
-    return nullptr;
+    if (this->compare(dynamic_cast<NaturalNumber&>(other)) < 0) {
+        throw std::invalid_argument("Первое число должно быть больше или равно второму!");
+    }
+
+    std::vector<uint8_t> result;
+    int carry = 0; // Debt
+    for (size_t i = 0; i < digits_first.size(); ++i) { 
+        int current = digits_first[i] - ( (i < digits_second.size() ) ? digits_second[i] : 0) - carry; // Result of the subtraction on the i-th step
+        if (current < 0) {
+            current += 10;
+            carry = 1;
+        } else {
+            carry = 0;
+        }
+
+        result.push_back(static_cast<uint8_t>(current));
+    }
+
+    // Delete unsignificant zeroes at the end of the number
+    while (result.size() > 1 && result.back() == 0) {
+        result.pop_back();
+    }
+
+    return std::make_unique<NaturalNumber>((gather_digits_into_number(result)));
 }
 
 std::unique_ptr<Number> NaturalNumber::multiply(Number &other) const {
@@ -170,7 +195,10 @@ std::unique_ptr<Number> NaturalNumber::calculate_gcd(NaturalNumber& other) const
 
 }
 
-std::unique_ptr<Number> NaturalNumber::calculate_lcm(NaturalNumber& other) const {
-
-    return nullptr;
+std::unique_ptr<Number> NaturalNumber::calculate_lcm(NaturalNumber& other) {
+    std::unique_ptr<Number> gcd_ptr = this->calculate_gcd(other);
+    NaturalNumber* gcd = dynamic_cast<NaturalNumber*>(gcd_ptr.get());
+    std::unique_ptr<Number> temp_ptr = this->division_numbers_with_remainder(*gcd);
+    NaturalNumber* temp = dynamic_cast<NaturalNumber*>(temp_ptr.get());
+    return temp->multiply(other);
 }
