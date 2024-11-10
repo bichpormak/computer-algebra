@@ -99,8 +99,11 @@ uint8_t NaturalNumber::compare(NaturalNumber &other) const {
 }
 
 bool NaturalNumber::is_zero() const {
-
-    return false;
+    auto num = this->get_digits_of_number();
+    if (num[0] != 0){
+        return false;
+    }
+    return true;
 }
 
 std::unique_ptr<Number> NaturalNumber::add_one() const {
@@ -131,10 +134,59 @@ std::unique_ptr<Number> NaturalNumber::get_first_digit_after_division_number_on_
 }
 
 std::unique_ptr<Number> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
+    auto dividend_digits = this->get_digits_of_number(); // Digits of the dividend
+    auto divisor_digits = other.get_digits_of_number();  // Digits of the divisor
 
+    if (other.is_zero()) {
+        throw std::invalid_argument("Division by zero");
+    }
 
+    int cmp_result = this->compare(dynamic_cast<NaturalNumber &>(other));
 
-    return nullptr;
+    if (cmp_result == 1) {
+        return std::make_unique<NaturalNumber>(0); // Dividend is smaller than divisor
+    } else if (cmp_result == 0) {
+        return std::make_unique<NaturalNumber>(1); // Dividend equals divisor
+    }
+
+    std::vector<int> quotient_digits;
+    std::vector<int> current_digits;
+
+    size_t idx = 0;
+
+    // Process each digit of the dividend
+    while (idx < dividend_digits.size()) {
+        // Bring down the next digit
+        current_digits.push_back(dividend_digits[idx]);
+        NaturalNumber current_number(gather_digits_into_number(current_digits));
+
+        // Remove leading zeros from current_number
+        while (current_digits.size() > 1 && current_digits[0] == 0) {
+            current_digits.erase(current_digits.begin());
+            current_number = NaturalNumber(gather_digits_into_number(current_digits));
+        }
+
+        int q = 0;
+        // Subtract divisor from current_number until it becomes smaller
+        while (current_number.compare(dynamic_cast<NaturalNumber &>(other)) >= 0) {
+            current_number = *dynamic_cast<NaturalNumber *>(current_number.subtract(other).release());
+            q += 1;
+        }
+
+        quotient_digits.push_back(q);
+
+        // Update current_digits with the remainder
+        current_digits = current_number.get_digits_of_number();
+
+        idx += 1;
+    }
+
+    // Remove leading zeros from quotient
+    while (quotient_digits.size() > 1 && quotient_digits[0] == 0) {
+        quotient_digits.erase(quotient_digits.begin());
+    }
+
+    return std::make_unique<NaturalNumber>(gather_digits_into_number(quotient_digits));
 }
 
 std::unique_ptr<Number> NaturalNumber::calculating_remainder_after_division(NaturalNumber& other) const {
