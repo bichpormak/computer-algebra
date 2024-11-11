@@ -7,9 +7,14 @@
 
 class RationalNumber {
 private:
-    // IntegerNumber& numerator_integer_number_;
-    // NaturalNumber& denominator_natural_number_;
+    IntegerNumber numerator_integer_number_;
+    NaturalNumber denominator_natural_number_;
 
+public:
+    RationalNumber(IntegerNumber numerator, NaturalNumber denominator)
+        :
+        numerator_integer_number_(numerator),
+        denominator_natural_number_(denominator) {}
 
 };
 

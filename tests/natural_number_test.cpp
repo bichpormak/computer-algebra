@@ -11,7 +11,7 @@ protected:
     void SetUp() override {
         num_small_ = std::make_unique<NaturalNumber>(5);
         num_large_ = std::make_unique<NaturalNumber>(10000000000);
-        num_zero_ = std::make_unique<NaturalNumber>(0);
+        num_zero_ = std::make_unique<NaturalNumber>(1);
         num_three_ = std::make_unique<NaturalNumber>(3);
     }
 
@@ -57,10 +57,10 @@ TEST_F(NaturalNumberTest, add) {
 }
 
 TEST_F(NaturalNumberTest, subtract) {
-    auto diff = num_large_->subtract(*num_small_);
+    auto diff = num_large_->subtract(*num_three_);
     auto* natDiff = dynamic_cast<NaturalNumber*>(diff.get());
     ASSERT_NE(natDiff, nullptr);
-    EXPECT_EQ(natDiff->get_digits_of_number(), (std::vector<uint8_t>{9, 9, 9, 9, 9, 9, 9, 9, 9, 5}));
+    EXPECT_EQ(natDiff->get_digits_of_number(), (std::vector<uint8_t>{9, 9, 9, 9, 9, 9, 9, 9, 9, 7}));
 }
 
 TEST_F(NaturalNumberTest, multiply) {

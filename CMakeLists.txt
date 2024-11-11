@@ -24,9 +24,7 @@ add_library(computer_algebra_lib
         src/model/integer_numbers.cpp
         src/model/rational_numbers.cpp
         src/model/polynomial.cpp
-        src/core/processing_input.h
         src/core/processing_input.cpp
-
 )
 
 target_include_directories(computer_algebra_lib PUBLIC
@@ -51,3 +49,23 @@ target_link_libraries(computer-algebra-test PRIVATE computer_algebra_lib gtest_m
 
 include(GoogleTest)
 gtest_discover_tests(computer-algebra-test)
+
+set(CMAKE_PREFIX_PATH "C:/Qt/6.8.0/mingw_64/")
+
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+add_executable(computer-algebra-gui
+        src/gui/main.cpp
+        src/gui/main_window.cpp
+        src/gui/main_window.h
+        src/gui/natural_number_window.cpp
+        src/gui/natural_number_window.h
+)
+
+target_link_libraries(computer-algebra-gui PRIVATE computer_algebra_lib Qt6::Widgets)
+
+target_include_directories(computer-algebra-gui PRIVATE src/gui)

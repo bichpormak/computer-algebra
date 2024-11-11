@@ -1,8 +1,7 @@
 #ifndef INTEGER_NUMBERS_H
 #define INTEGER_NUMBERS_H
 
-#include "number.h"
-#include "natural_numbers.h"
+#include "natural_number.h"
 
 
 class IntegerNumber : public Number {
@@ -17,7 +16,6 @@ public:
     std::unique_ptr<Number> get_absolute_value() const override;
     std::unique_ptr<Number> change_sign() const override;
 
-    int8_t IntegerNumber::compare_integer(Number& other) const;
     int8_t is_number_positive() const;
     std::unique_ptr<Number> converting_natural_to_integer() const;
     std::unique_ptr<Number> converting_positive_integer_to_natural() const;
