@@ -35,7 +35,11 @@ std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const {
     return nullptr;
 }
 
-bool RationalNumber::is_reduced() const {
-
-    return false;
+bool RationalNumber::is_integer() const {
+    if (denominator_natural_number_.get_number() == 1){
+        return true;
+    }
+    else{
+        return false;
+    }
 }

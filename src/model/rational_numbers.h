@@ -24,7 +24,7 @@ public:
     std::unique_ptr<RationalNumber> convert_integer_to_fraction() const;
     std::unique_ptr<RationalNumber> convert_reduced_fraction_to_integer() const;
     std::unique_ptr<RationalNumber> reduce_fraction() const;
-    bool is_reduced() const;
+    bool is_integer() const;
 
 };
 
