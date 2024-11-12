@@ -1,15 +1,18 @@
 #include "natural_number.h"
 
-std::unique_ptr<Number> NaturalNumber::add(Number &other) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::add(NaturalNumber &other) const {
+
     auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
-    if (this->compare(dynamic_cast<NaturalNumber &>(other)) == 1){ //finding a larger number
+    if (this->compare(other) == 1){ //finding a larger number
         auto tmp = num2;
         num2 = num1;
         num1 = tmp;
     };
-    num1 = reverse_digits_in_vector(num1); // reversal of a larger number
+
+    num1 = reverse_digits_in_vector(num1); // reversal of a larger number 
     num2 = reverse_digits_in_vector(num2);
+
     for (size_t k = 0; k < num2.size(); ++k){ 
 
         num1[k] += num2[k]; // bitwise addition of digits
@@ -22,17 +25,19 @@ std::unique_ptr<Number> NaturalNumber::add(Number &other) const {
             num1[k] -= 10;
         }
     }
+
     num1 = reverse_digits_in_vector(num1); 
     
     return std::make_unique<NaturalNumber>((gather_digits_into_number(num1)));
     
 }
 
-std::unique_ptr<Number> NaturalNumber::subtract(Number &other) const {
-    auto digits_first = this->get_digits_of_number();
-    auto digits_second = other.get_digits_of_number();
+std::unique_ptr<NaturalNumber> NaturalNumber::subtract(NaturalNumber &other) const {
 
-    if (this->compare(dynamic_cast<NaturalNumber&>(other)) < 0) {
+    auto digits_first = reverse_digits_in_vector(this->get_digits_of_number());
+    auto digits_second = reverse_digits_in_vector(other.get_digits_of_number());
+
+    if (this->compare(other) <= 1) {
         throw std::invalid_argument("Первое число должно быть больше или равно второму!");
     }
 
@@ -50,58 +55,35 @@ std::unique_ptr<Number> NaturalNumber::subtract(Number &other) const {
         result.push_back(static_cast<uint8_t>(current));
     }
 
-    // Delete unsignificant zeroes at the end of the number
-    while (result.size() > 1 && result.back() == 0) {
-        result.pop_back();
-    }
+    result = reverse_digits_in_vector(result);
 
-    return std::make_unique<NaturalNumber>((gather_digits_into_number(result)));
+    return std::make_unique<NaturalNumber>(gather_digits_into_number(result));
 }
 
-std::unique_ptr<Number> NaturalNumber::multiply(Number &other) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::multiply(NaturalNumber &other) const {
+
     auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
-
-    std::unique_ptr<NaturalNumber> result = std::make_unique<NaturalNumber>(0);
-
     num2 = reverse_digits_in_vector(num2);
 
-    std::unique_ptr<NaturalNumber> tmp = std::make_unique<NaturalNumber>(gather_digits_into_number(num1));
+    std::unique_ptr<NaturalNumber> result = this->multiply_by_digit(num2[0]);
 
-    for (size_t k = 0; k < num2.size(); ++k) {
-        auto partial_product = tmp->multiply_by_digit(num2[k]);
-
-        auto shifted_product_ptr = dynamic_cast<NaturalNumber*>(partial_product.get());
-
-        auto shifted_product = shifted_product_ptr->multiply_by_ten_in_power(k);
-
-        result = std::unique_ptr<NaturalNumber>(dynamic_cast<NaturalNumber*>(result->add(*shifted_product).release()));
+    for (size_t k = 1; k < num2.size(); ++k) {
+        auto partial_product = this->multiply_by_digit(num2[k]);
+        auto shifted_product = partial_product->multiply_by_ten_in_power(k);
+        result = std::unique_ptr<NaturalNumber>(result->add(*shifted_product).release());
     }
-    
+
     return result;
-
 }
 
-std::unique_ptr<Number> NaturalNumber::divide(Number &other) const {
-
-
-    return nullptr;
-}
-
-std::unique_ptr<Number> NaturalNumber::get_absolute_value() const {
-
-    return nullptr;
-}
-
-std::unique_ptr<Number> NaturalNumber::change_sign() const {
-
-    return nullptr;
-}
 
 uint8_t NaturalNumber::compare(NaturalNumber &other) const {
+
     auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
-    int result = 0; 
+    int result = 0;
+
     if (num1.size() > num2.size()){ // if the number of digits in the first number is greater than the number of digits in the second, then the first number is greater than the second
         result = 2;
     }
@@ -109,7 +91,9 @@ uint8_t NaturalNumber::compare(NaturalNumber &other) const {
         result = 1;
     }
     else{ // bitwise comparison, if the number of bits matches
+
         for (size_t i = 0; i < num1.size(); ++i){
+
             if(num1[i] > num2[i]){
                 result = 2;
                 break;
@@ -118,7 +102,9 @@ uint8_t NaturalNumber::compare(NaturalNumber &other) const {
                 result = 1;
                 break;
             }
+
         }
+
     }
 
     return result;
@@ -129,39 +115,91 @@ bool NaturalNumber::is_zero() const {
     return false;
 }
 
-std::unique_ptr<Number> NaturalNumber::add_one() const {
+std::unique_ptr<NaturalNumber> NaturalNumber::add_one() const {
 
-    return nullptr;
+    auto num1 = reverse_digits_in_vector(this->get_digits_of_number());
+    int carry = 1;
+
+    for (size_t k = 0; k < num1.size(); ++k) {
+        num1[k] += carry;
+
+        if (num1[k] >= 10) {
+            num1[k] -= 10;
+            carry = 1;
+        } else {
+            carry = 0;
+            break;
+        }
+
+    }
+
+    if (carry > 0) {
+        num1.push_back(carry);
+    }
+
+    num1 = reverse_digits_in_vector(num1);
+    return std::make_unique<NaturalNumber>(gather_digits_into_number(num1));
+
 }
 
-std::unique_ptr<Number> NaturalNumber::multiply_by_digit(int64_t digit) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::multiply_by_digit(int64_t digit) const {
 
-    return nullptr;
+    if (digit < 0 || digit > 9) {
+        throw std::invalid_argument("Цифра должна быть от 0 до 9");
+    }
+
+    auto num1 = this->get_digits_of_number();
+    num1 = reverse_digits_in_vector(num1);
+    int carry = 0;
+
+    for (size_t k = 0; k < num1.size(); ++k) {
+        int product = num1[k] * digit + carry;
+        num1[k] = product % 10;
+        carry = product / 10;
+    }
+
+    if (carry > 0) {
+        num1.push_back(carry);
+    }
+
+    num1 = reverse_digits_in_vector(num1);
+    return std::make_unique<NaturalNumber>(gather_digits_into_number(num1));
 }
-std::unique_ptr<Number> NaturalNumber::multiply_by_ten_in_power(int64_t power) const {
 
-    return nullptr;
+std::unique_ptr<NaturalNumber> NaturalNumber::multiply_by_ten_in_power(int64_t power) const {
+
+    if (power < 0) {
+        throw std::invalid_argument("Степень должна быть неотрицательной!");
+    }
+
+    auto num1 = this->get_digits_of_number();
+    for (int i = 0; i < power; ++i) {
+        num1.push_back(0);
+    }
+
+    return std::make_unique<NaturalNumber>(gather_digits_into_number(num1));
+
 }
 
-std::unique_ptr<Number> NaturalNumber::subtract_with_multiply_digit(NaturalNumber& other, int64_t digit) const {
-    std::unique_ptr<Number> multiplied = other.multiply_by_digit(digit);
+std::unique_ptr<NaturalNumber> NaturalNumber::subtract_with_multiply_digit(NaturalNumber& other, int64_t digit) const {
 
-    std::unique_ptr<Number> result = this->subtract(*multiplied);
+    std::unique_ptr<NaturalNumber> multiplied = other.multiply_by_digit(digit);
+    std::unique_ptr<NaturalNumber> result = this->subtract(*multiplied);
 
     return result;
 }
 
-std::unique_ptr<Number> NaturalNumber::get_first_digit_after_division_number_on_ten_in_power(int64_t power) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::get_first_digit_after_division_number_on_ten_in_power(int64_t power) const {
 
     return nullptr;
 }
 
-std::unique_ptr<Number> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
 
     auto num1 = this->get_digits_of_number();
     auto num2 = other.get_digits_of_number();
 
-    if (this->compare(dynamic_cast<NaturalNumber &>(other)) == 1){ //finding a larger number
+    if (this->compare(other) == 1){ //finding a larger number
         auto tmp = num2;
         num2 = num1;
         num1 = tmp;
@@ -178,23 +216,23 @@ std::unique_ptr<Number> NaturalNumber::division_numbers_with_remainder(NaturalNu
 
 }
 
-std::unique_ptr<Number> NaturalNumber::calculating_remainder_after_division(NaturalNumber& other) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::calculating_remainder_after_division(NaturalNumber& other) const {
 
-    std::unique_ptr<Number> incomplete_quotient = division_numbers_with_remainder(other);
+    std::unique_ptr<NaturalNumber> incomplete_quotient = division_numbers_with_remainder(other);
 
     return subtract_with_multiply_digit(other, incomplete_quotient->get_number());
 
 }
 
-std::unique_ptr<Number> NaturalNumber::calculate_gcd(NaturalNumber& other) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::calculate_gcd(NaturalNumber& other) const {
 
     auto firstNumber = *this;
     auto secondNumber = other;
 
     while (!secondNumber.is_zero()) {
 
-        std::unique_ptr<Number> remainder_ptr = firstNumber.calculating_remainder_after_division(secondNumber);
-        NaturalNumber* remainder = dynamic_cast<NaturalNumber*>(remainder_ptr.get());
+        std::unique_ptr<NaturalNumber> remainder_ptr = firstNumber.calculating_remainder_after_division(secondNumber);
+        NaturalNumber* remainder = remainder_ptr.get();
 
         if (firstNumber.compare(secondNumber) == 2) {
             firstNumber = secondNumber;
@@ -211,10 +249,14 @@ std::unique_ptr<Number> NaturalNumber::calculate_gcd(NaturalNumber& other) const
 
 }
 
-std::unique_ptr<Number> NaturalNumber::calculate_lcm(NaturalNumber& other) {
-    std::unique_ptr<Number> gcd_ptr = this->calculate_gcd(other);
-    NaturalNumber* gcd = dynamic_cast<NaturalNumber*>(gcd_ptr.get());
-    std::unique_ptr<Number> temp_ptr = this->division_numbers_with_remainder(*gcd);
-    NaturalNumber* temp = dynamic_cast<NaturalNumber*>(temp_ptr.get());
+std::unique_ptr<NaturalNumber> NaturalNumber::calculate_lcm(NaturalNumber& other) {
+
+    std::unique_ptr<NaturalNumber> gcd_ptr = this->calculate_gcd(other);
+    NaturalNumber* gcd = gcd_ptr.get();
+
+    std::unique_ptr<NaturalNumber> temp_ptr = this->division_numbers_with_remainder(*gcd);
+    NaturalNumber* temp = temp_ptr.get();
+
     return temp->multiply(other);
+
 }

@@ -9,6 +9,7 @@
 #include <QApplication>
 
 #include "natural_number_window.h"
+#include "integer_number_window.h"
 
 
 class MainWindow : public QWidget {

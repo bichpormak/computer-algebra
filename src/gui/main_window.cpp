@@ -50,7 +50,10 @@ void MainWindow::on_natural_numbers_clicked() {
 }
 
 void MainWindow::on_integers_clicked() {
-    QMessageBox::information(this, "Целые числа", "Вы нажали на кнопку Целые числа.");
+    IntegerNumberWindow *integer_number_window = new IntegerNumberWindow();
+    integer_number_window->setAttribute(Qt::WA_DeleteOnClose);
+    integer_number_window->setWindowFlags(Qt::Window);
+    integer_number_window->show();
 }
 
 void MainWindow::on_rational_numbers_clicked() {

@@ -18,13 +18,12 @@ class NaturalNumberWindow : public QWidget {
     Q_OBJECT
 
 public:
-    NaturalNumberWindow(QWidget *parent = nullptr);
+    NaturalNumberWindow(QWidget *parent = Q_NULLPTR);
 
 private slots:
     void add_clicked();
     void subtract_clicked();
     void multiply_clicked();
-    void divide_clicked();
     void compare_clicked();
     void is_zero_clicked();
     void add_one_clicked();
@@ -43,7 +42,6 @@ private:
     QPushButton *add_;
     QPushButton *subtract_;
     QPushButton *multiply_;
-    QPushButton *divide_;
     QPushButton *add_one_;
     QPushButton *multiply_by_digit_;
     QPushButton *multiply_by_ten_in_power_;

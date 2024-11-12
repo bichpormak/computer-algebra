@@ -32,13 +32,6 @@ public:
     SignNumber get_sign() const { return sign_; }
     uint8_t get_elder_digit_order() const { return highest_order_digit_; }
 
-public:
-    virtual std::unique_ptr<Number> add(Number& other) const = 0;
-    virtual std::unique_ptr<Number> subtract(Number& other) const = 0;
-    virtual std::unique_ptr<Number> multiply(Number& other) const = 0;
-    virtual std::unique_ptr<Number> divide(Number& other) const = 0;
-    virtual std::unique_ptr<Number> get_absolute_value() const = 0;
-    virtual std::unique_ptr<Number> change_sign() const = 0;
 };
 
 

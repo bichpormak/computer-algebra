@@ -64,6 +64,10 @@ add_executable(computer-algebra-gui
         src/gui/main_window.h
         src/gui/natural_number_window.cpp
         src/gui/natural_number_window.h
+        src/gui/integer_number_window.cpp
+        src/gui/integer_number_window.h
+        src/gui/rational_number_window.cpp
+        src/gui/rational_number_window.h
 )
 
 target_link_libraries(computer-algebra-gui PRIVATE computer_algebra_lib Qt6::Widgets)

@@ -70,13 +70,6 @@ TEST_F(NaturalNumberTest, multiply) {
     EXPECT_EQ(natProduct->get_digits_of_number(), (std::vector<uint8_t>{5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
-TEST_F(NaturalNumberTest, divide) {
-    auto quotient = num_large_->divide(*num_small_);
-    auto* natQuotient = dynamic_cast<NaturalNumber*>(quotient.get());
-    ASSERT_NE(natQuotient, nullptr);
-    EXPECT_EQ(natQuotient->get_digits_of_number(), (std::vector<uint8_t>{2, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-}
-
 TEST_F(NaturalNumberTest, calculate_gcd) {
     auto gcd = num_small_->calculate_gcd(*num_large_);
     auto* natGcd = dynamic_cast<NaturalNumber*>(gcd.get());
@@ -98,12 +91,6 @@ TEST_F(NaturalNumberTest, multiply_by_ten_in_power) {
     EXPECT_EQ(natResult->get_digits_of_number(), (std::vector<uint8_t>{5, 0, 0}));
 }
 
-TEST_F(NaturalNumberTest, change_sign) {
-    EXPECT_THROW({
-        auto changed = num_small_->change_sign();
-    }, std::logic_error);
-}
-
 TEST_F(NaturalNumberTest, get_first_digit_after_division_on_ten_in_power) {
     auto result = num_large_->get_first_digit_after_division_number_on_ten_in_power(1);
     auto* natResult = dynamic_cast<NaturalNumber*>(result.get());
@@ -111,17 +98,6 @@ TEST_F(NaturalNumberTest, get_first_digit_after_division_on_ten_in_power) {
     EXPECT_EQ(natResult->get_digits_of_number(), std::vector<uint8_t>{1});
 }
 
-TEST_F(NaturalNumberTest, get_absolute_value) {
-    auto abs_value_small = num_small_->get_absolute_value();
-    auto* natAbsSmall = dynamic_cast<NaturalNumber*>(abs_value_small.get());
-    ASSERT_NE(natAbsSmall, nullptr);
-    EXPECT_EQ(natAbsSmall->get_digits_of_number(), num_small_->get_digits_of_number());
-
-    auto abs_value_large = num_large_->get_absolute_value();
-    auto* natAbsLarge = dynamic_cast<NaturalNumber*>(abs_value_large.get());
-    ASSERT_NE(natAbsLarge, nullptr);
-    EXPECT_EQ(natAbsLarge->get_digits_of_number(), num_large_->get_digits_of_number());
-}
 
 TEST_F(NaturalNumberTest, subtract_with_multiply_digit) {
     auto result = num_large_->subtract_with_multiply_digit(*num_small_, 2);

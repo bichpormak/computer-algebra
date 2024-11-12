@@ -38,9 +38,9 @@ SignNumber determining_sign_number(int64_t input_number) {
 
 }
 int64_t gather_digits_into_number(std::vector<uint8_t> digits_of_number){
-    int64_t result = 0;
-    for (size_t i = 0; i < digits_of_number.size(); ++i){
-        result += digits_of_number[i] * std::pow(10, i); 
+    int64_t number = 0;
+    for (auto digit : digits_of_number) {
+        number = number * 10 + digit;
     }
-    return result;
+    return number;
 }
