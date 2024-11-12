@@ -42,9 +42,11 @@ std::unique_ptr<IntegerNumber> IntegerNumber::multiply(NaturalNumber& other) con
     return nullptr;
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::get_absolute_value() const {
-
-    return nullptr;
+std::unique_ptr<IntegerNumber> IntegerNumber::get_absolute_value(Number& other) const {
+    if(other->get_sign() == SignNumber::NEGATIVE){
+        return change_sign(other);
+    }
+    return other;
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::change_sign() const {
@@ -52,9 +54,12 @@ std::unique_ptr<IntegerNumber> IntegerNumber::change_sign() const {
     return nullptr;
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer() const {
-
-    return nullptr;
+std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer(Number& other) const {
+    auto* other_natural = dynamic_cast<NaturalNumber*>(&other);
+    if (!other_natural) {
+        throw std::invalid_argument("Incompatible number type for converting natural to integer");
+    }
+    return std::make_unique<IntegerNumber>(other_natural->get_value());
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::converting_positive_integer_to_natural() const {
