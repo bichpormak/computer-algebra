@@ -25,9 +25,8 @@ std::unique_ptr<RationalNumber> RationalNumber::convert_integer_to_fraction() co
     return nullptr;
 }
 
-std::unique_ptr<RationalNumber> RationalNumber::convert_reduced_fraction_to_integer() const {
-
-    return nullptr;
+std::unique_ptr<IntegerNumber> RationalNumber::convert_reduced_fraction_to_integer() const {
+    return std::make_unique<IntegerNumber>(this->numerator_integer_number_);
 }
 
 std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const {
