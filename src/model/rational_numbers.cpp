@@ -31,8 +31,12 @@ std::unique_ptr<RationalNumber> RationalNumber::convert_reduced_fraction_to_inte
 }
 
 std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const {
-
-    return nullptr;
+    std::unique_ptr<NaturalNumber> num1 = numerator_integer_number_.get_absolute_value();
+    NaturalNumber num2 = denominator_natural_number_;
+    std::unique_ptr<NaturalNumber> gcd = num1->calculate_gcd(num2);
+    std::unique_ptr<NaturalNumber> numerator = num1->division_numbers_with_remainder(*gcd);
+    std::unique_ptr<NaturalNumber> denominator = num2.division_numbers_with_remainder(*gcd);
+    return std::make_unique<RationalNumber>(*numerator, *denominator);
 }
 
 bool RationalNumber::is_reduced() const {
