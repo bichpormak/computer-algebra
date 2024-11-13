@@ -31,12 +31,12 @@ std::unique_ptr<RationalNumber> RationalNumber::convert_reduced_fraction_to_inte
 }
 
 std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const {
-
     return nullptr;
 }
 
 bool RationalNumber::is_integer() const {
-    if (denominator_natural_number_.get_number() == 1){
+    auto reduced_fraction = this->reduce_fraction();
+    if (reduced_fraction->denominator_natural_number_.get_number() == 1){
         return true;
     }
     else{
