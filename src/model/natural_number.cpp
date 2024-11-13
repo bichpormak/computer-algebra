@@ -111,8 +111,13 @@ uint8_t NaturalNumber::compare(NaturalNumber &other) const {
 }
 
 bool NaturalNumber::is_zero() const {
-
-    return false;
+    auto digits = this->get_digits_of_number();
+        // If the number has only one digit and that digit is 0
+    if (digits.size() == 1 && digits[0] == 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::add_one() const {
@@ -190,8 +195,31 @@ std::unique_ptr<NaturalNumber> NaturalNumber::subtract_with_multiply_digit(Natur
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::get_first_digit_after_division_number_on_ten_in_power(int64_t power) const {
+    if (power < 0) {
+        throw std::invalid_argument("Power must be non-negative");
+    }
 
-    return nullptr;
+    // Create divisor = 10^power
+    auto divisor = std::make_unique<NaturalNumber>(1);
+    if (power > 0) {
+        divisor = divisor->multiply_by_ten_in_power(power);
+    }
+
+    // Find the largest digit d (from 9 down to 1) such that d * divisor <= this
+    for (int d = 9; d >= 1; --d) {
+        // Multiply divisor by digit d
+        auto d_times_divisor = divisor->multiply_by_digit(d);
+
+        // Compare this number with d_times_divisor
+        uint8_t cmp_result = this->compare(*d_times_divisor);
+
+        if (cmp_result == 2 || cmp_result == 0) { // this >= d_times_divisor
+            return std::make_unique<NaturalNumber>(d);
+        }
+    }
+
+    // If no such d found, return 0
+    return std::make_unique<NaturalNumber>(0);
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
