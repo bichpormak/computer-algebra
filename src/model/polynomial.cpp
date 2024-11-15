@@ -19,7 +19,7 @@ std::unique_ptr<Polynomial> multiply_by_rational(const RationalNumber& scalar) c
         auto new_key = std::make_unique<NaturalNumber>(*key + k);
         new_coefficients[std::move(new_key)] = std::make_unique<RationalNumber>(*value);
     }
-
+    
     return std::make_unique<Polynomial>(new_coefficients);
     }
 
