@@ -4,7 +4,6 @@
 
 #include <numeric>
 
-
 std::unique_ptr<Polynomial> Polynomial::derivative() const { //DER_P_P
     std::map<std::unique_ptr<int>, std::unique_ptr<RationalNumber>> derivative_coefficients;
 
