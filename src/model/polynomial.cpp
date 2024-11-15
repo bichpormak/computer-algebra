@@ -1,6 +1,6 @@
 #include "polynomial.h"
 
-std::unique_ptr<Polynomial> multiply_by_rational(const RationalNumber& scalar) const {
+    std::unique_ptr<Polynomial> multiply_by_rational(const RationalNumber& scalar) const {
     for (const auto& [key, value] : coefficients_) {
         auto new_coefficient = std::make_unique<RationalNumber>(*value * scalar);
         
@@ -36,7 +36,6 @@ std::unique_ptr<Polynomial> multiply_by_rational(const RationalNumber& scalar) c
     if (p2.coefficients_.empty()) {
         return std::make_unique<Polynomial>(p1);
     }
-
 
     std::unique_ptr<Polynomial> remainder = p1.remainder(p2);
     return gcd(p2, *remainder);
