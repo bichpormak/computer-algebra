@@ -16,7 +16,6 @@ std::unique_ptr<RationalNumber> RationalNumber::multiply(RationalNumber &other) 
 
     IntegerNumber denominator1(this->denominator_natural_number_.get_number());
     IntegerNumber denominator2(other.denominator_natural_number_.get_number());
-    
     auto result_numerator = numerator1.multiply(numenator2);
 
     auto result_denominator = denominator1.multiply(denominator2);
@@ -34,7 +33,7 @@ std::unique_ptr<RationalNumber> RationalNumber::divide(RationalNumber& other) co
 
     IntegerNumber denominator1(this->denominator_natural_number_.get_number());
     IntegerNumber denominator2(other.denominator_natural_number_.get_number());
-    
+
     auto result_numerator = numerator1.multiply(denominator2); // a/b / c/d = a*d / b*c
 
     auto result_denominator = denominator2.multiply(numenator2);

@@ -1,5 +1,5 @@
+// integer_numbers.cpp
 #include "integer_numbers.h"
-
 
 int8_t IntegerNumber::is_number_positive() const {
     if (this->get_number() == 0) {
@@ -8,106 +8,130 @@ int8_t IntegerNumber::is_number_positive() const {
     return (this->get_sign() == SignNumber::POSITIVE) ? 2 : 1;
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::add(NaturalNumber& other) const {
+std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
+    int8_t sign1 = this->is_number_positive();
+    int8_t sign2 = other.is_number_positive();
 
+    auto abs_this = this->get_absolute_value();       // Returns std::unique_ptr<NaturalNumber>
+    auto abs_other = other.get_absolute_value();      // Returns std::unique_ptr<NaturalNumber>
 
-return nullptr;
+    if (sign1 == sign2) {
+        auto abs_sum = abs_this->add(*abs_other);     // Add absolute values
+        auto result = converting_natural_to_integer(*abs_sum);
+        if (sign1 == 1) {
+            // Negative result
+            return result->change_sign();
+        } else {
+            return result;
+        }
+    } else {
+        uint8_t compare_result = abs_this->compare(*abs_other);
+        if (compare_result == 0) {
+            // Result is zero
+            return std::make_unique<IntegerNumber>(0);
+        } else if (compare_result == 2) {
+            // abs_this > abs_other
+            auto abs_diff = abs_this->subtract(*abs_other);
+            auto result = converting_natural_to_integer(*abs_diff);
+            if (sign1 == 1) {
+                // Negative result
+                return result->change_sign();
+            } else {
+                return result;
+            }
+        } else {
+            // abs_other > abs_this
+            auto abs_diff = abs_other->subtract(*abs_this);
+            auto result = converting_natural_to_integer(*abs_diff);
+            if (sign2 == 1) {
+                // Negative result
+                return result->change_sign();
+            } else {
+                return result;
+            }
+        }
+    }
 }
 
-
 std::unique_ptr<IntegerNumber> IntegerNumber::subtract(IntegerNumber& other) const {
-    return nullptr;
+    auto negated_other = other.change_sign();
+    return this->add(*negated_other);
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::multiply(IntegerNumber& other) const {
-    // auto* other_integer = dynamic_cast<IntegerNumber*>(&other);
-    // if (!other_integer) {
-    //     throw std::invalid_argument("Incompatible number type for multiplication.");
-    // }
-    //
-    // auto abs_this = dynamic_cast<NaturalNumber*>(this->get_absolute_value().get());
-    // auto abs_other = dynamic_cast<NaturalNumber*>(other_integer->get_absolute_value().get());
-    //
-    // auto abs_result = abs_this->multiply(*abs_other);
-    //
-    // int8_t sign1 = this->is_number_positive();
-    // int8_t sign2 = other_integer->is_number_positive();
-    //
-    // if (sign1 == sign2) {
-    //     return abs_result;
-    // } else {
-    //     return abs_result->change_sign();
-    // }
+    auto abs_this = this->get_absolute_value();
+    auto abs_other = other.get_absolute_value();
 
-    return nullptr;
+    auto abs_result = abs_this->multiply(*abs_other);
+
+    int8_t sign1 = this->is_number_positive();
+    int8_t sign2 = other.is_number_positive();
+
+    auto result = converting_natural_to_integer(*abs_result);
+
+    if ((sign1 == 1 && sign2 == 2) || (sign1 == 2 && sign2 == 1)) {
+        // Negative result
+        return result->change_sign();
+    } else {
+        return result;
+    }
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::get_absolute_value() const {
-
-    return nullptr;
+std::unique_ptr<NaturalNumber> IntegerNumber::get_absolute_value() const {
+    int64_t value = this->get_number();
+    if (value < 0) {
+        value = -value;
+    }
+    return std::make_unique<NaturalNumber>(value);
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::change_sign() const {
-    if(this->is_number_positive() == 2){
-        return std::make_unique<IntegerNumber>(IntegerNumber(-(this->get_number())));
-    }
-    else{
-        return std::make_unique<IntegerNumber>(IntegerNumber(this->get_number()));
-    }
-    return nullptr;
+    return std::make_unique<IntegerNumber>(-this->get_number());
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer() const {
-
-    return nullptr;
+std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer(NaturalNumber& other) {
+    return std::make_unique<IntegerNumber>(other.get_number());
 }
 
 std::unique_ptr<NaturalNumber> IntegerNumber::converting_positive_integer_to_natural() const {
-    if (this->is_number_positive() == 2){
-        return std::make_unique<NaturalNumber>(NaturalNumber(this->get_number()));
+    if (this->is_number_positive() == 2) {
+        return std::make_unique<NaturalNumber>(this->get_number());
+    } else {
+        throw std::invalid_argument("Cannot convert negative integer to natural number!");
     }
-    else{
-        throw std::invalid_argument("Invalid number!\n");
-    }
- 
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::calculating_quotient(IntegerNumber& other) const {
     if (other.is_number_positive() == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
     }
-    int8_t quotient_sign = this->is_number_positive() + other.is_number_positive();
-    std::unique_ptr<IntegerNumber> num1 = this->get_absolute_value();
-    std::unique_ptr<IntegerNumber> num2 = other.get_absolute_value();
 
-    std::unique_ptr<NaturalNumber> natural_num1 = num1->converting_positive_integer_to_natural();
-    std::unique_ptr<NaturalNumber> natural_num2 = num2->converting_positive_integer_to_natural();
+    int8_t sign1 = this->is_number_positive();
+    int8_t sign2 = other.is_number_positive();
 
-    std::unique_ptr<NaturalNumber> quotient = natural_num1->division_numbers_with_remainder(*natural_num2);
+    auto abs_this = this->get_absolute_value();
+    auto abs_other = other.get_absolute_value();
 
-    if (quotient_sign == 4 || quotient_sign == 2){
-        return std::make_unique<IntegerNumber>(IntegerNumber(quotient->get_number()));
-    }
-    else if (quotient_sign == 3){
-        return std::make_unique<IntegerNumber>(IntegerNumber(quotient->get_number()).change_sign());
-    }
-    else{
-        return std::make_unique<IntegerNumber>(0);
+    auto quotient = abs_this->division_numbers_with_remainder(*abs_other);
+
+    auto result = converting_natural_to_integer(*quotient);
+
+    if ((sign1 == 1 && sign2 == 2) || (sign1 == 2 && sign2 == 1)) {
+        // Negative result
+        return result->change_sign();
+    } else {
+        return result;
     }
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::calculating_remainder_after_division(IntegerNumber& other) const {
-    auto num1 = this->get_digits_of_number();
-    auto num2 = other.get_digits_of_number();
-
-    if (num1.size() < num2.size()){
-        return std::make_unique<IntegerNumber>(IntegerNumber(this->get_number()));
+    if (other.is_number_positive() == 0) {
+        throw std::invalid_argument("Division by zero is not allowed.");
     }
-    auto quotient = this->calculating_quotient(other);
-    
-    auto product = quotient->multiply(other);
 
+    auto quotient = this->calculating_quotient(other);
+    auto product = quotient->multiply(other);
     auto remainder = this->subtract(*product);
 
-    return std::make_unique<IntegerNumber>(*remainder);
+    return remainder;
 }
