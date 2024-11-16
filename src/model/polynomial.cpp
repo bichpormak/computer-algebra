@@ -36,6 +36,6 @@ void normalize(){
     lcm_ = func_of_list(denominators, &NaturalNumber::calculate_lcm);
 
     for (const auto& pair : coefficients_) {
-        this->coefficients_[pair.first] = std::make_unique<RationalNumber>(std::make_unique<IntegerNumber>(*pair.second).numerator / gcd_,  std::make_unique<NaturalNumber>(*pair.second).denominator / lcm_);
+        this->coefficients_[pair.first] = std::make_unique<RationalNumber>((std::make_unique<IntegerNumber>(*pair.second).numerator / gcd_) * (lcm_ /  std::make_unique<NaturalNumber>(*pair.second).denominator), lcm_);
     }
 }
