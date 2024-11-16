@@ -2,12 +2,52 @@
 
 std::unique_ptr<RationalNumber> RationalNumber::add(RationalNumber &other) const {
 
-    return nullptr;
+    IntegerNumber numerator1 = this->numerator_integer_number_;
+    IntegerNumber numerator2 = other.numerator_integer_number_;
+
+    IntegerNumber denominator1(this->denominator_natural_number_.get_number());
+    IntegerNumber denominator2(other.denominator_natural_number_.get_number());
+
+    // Вычисляем общий знаменатель
+    auto common_denominator = denominator1.multiply(denominator2);
+
+    // Приводим числители к общему знаменателю
+    auto new_numerator1 = numerator1.multiply(denominator2);
+    auto new_numerator2 = numerator2.multiply(denominator1);
+
+    // Складываем числители
+    auto result_numerator = new_numerator1->add(*new_numerator2);
+
+    // Создаем результат без сокращения дроби
+    RationalNumber result(IntegerNumber(result_numerator->get_number()),
+                          NaturalNumber(common_denominator->get_number()));
+
+
+    return result.reduce_fraction();
 }
 
 std::unique_ptr<RationalNumber> RationalNumber::subtract(RationalNumber &other) const {
 
-    return nullptr;
+    IntegerNumber numerator1 = this->numerator_integer_number_;
+    IntegerNumber numerator2 = other.numerator_integer_number_;
+
+    IntegerNumber denominator1(this->denominator_natural_number_.get_number());
+    IntegerNumber denominator2(other.denominator_natural_number_.get_number());
+
+    // Вычисляем общий знаменатель
+    auto common_denominator = denominator1.multiply(denominator2);
+
+    // Приводим числители к общему знаменателю
+    auto new_numerator1 = numerator1.multiply(denominator2);
+    auto new_numerator2 = numerator2.multiply(denominator1);
+
+    // Вычитаем числители
+    auto result_numerator = new_numerator1->subtract(*new_numerator2);
+
+    // Создаем результат без сокращения дроби
+    RationalNumber result(IntegerNumber(result_numerator->get_number()),
+                          NaturalNumber(common_denominator->get_number()));
+    return result.reduce_fraction();
 }
 
 std::unique_ptr<RationalNumber> RationalNumber::multiply(RationalNumber &other) const {
@@ -36,7 +76,7 @@ std::unique_ptr<RationalNumber> RationalNumber::divide(RationalNumber& other) co
 
     auto result_numerator = numerator1.multiply(denominator2); // a/b / c/d = a*d / b*c
 
-    auto result_denominator = denominator2.multiply(numenator2);
+    auto result_denominator = denominator1.multiply(numenator2);
 
     return std::make_unique<RationalNumber>(RationalNumber(result_numerator->get_number(), result_denominator->get_number()));
 }
@@ -56,15 +96,47 @@ std::unique_ptr<IntegerNumber> RationalNumber::convert_reduced_fraction_to_integ
 }
 
 std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const {
-    return nullptr;
+    // Проверяем, равен ли числитель нулю
+    if (this->numerator_integer_number_.get_number() == 0) {
+        // Если числитель ноль, знаменатель устанавливаем равным 1
+        return std::make_unique<RationalNumber>(IntegerNumber(0), NaturalNumber(1));
+    }
+
+    // Получаем абсолютное значение числителя
+    auto abs_numerator = this->numerator_integer_number_.get_absolute_value();
+
+    // Получаем знаменатель
+    NaturalNumber denominator = this->denominator_natural_number_;
+
+    // Вычисляем НОД числителя и знаменателя
+    auto gcd_ptr = denominator.calculate_gcd(*abs_numerator);
+    NaturalNumber gcd = *gcd_ptr;
+
+    // Если НОД равен 1, дробь уже несократима
+    if (gcd.get_number() == 1) {
+        return std::make_unique<RationalNumber>(*this);
+    }
+
+    // Делим числитель на НОД
+    IntegerNumber divisor(gcd.get_number());
+    auto new_numerator_ptr = this->numerator_integer_number_.calculating_quotient(divisor);
+    if (!new_numerator_ptr) {
+        throw std::runtime_error("Ошибка при делении числителя на НОД.");
+    }
+    IntegerNumber new_numerator = *new_numerator_ptr;
+
+    // Делим знаменатель на НОД
+    auto new_denominator_ptr = denominator.division_numbers_with_remainder(gcd);
+    if (!new_denominator_ptr) {
+        throw std::runtime_error("Ошибка при делении знаменателя на НОД.");
+    }
+    NaturalNumber new_denominator = *new_denominator_ptr;
+
+    // Возвращаем новую, сокращенную дробь
+    return std::make_unique<RationalNumber>(RationalNumber(new_numerator, new_denominator));
 }
 
 bool RationalNumber::is_integer() const {
     auto reduced_fraction = this->reduce_fraction();
-    if (reduced_fraction->denominator_natural_number_.get_number() == 1){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return reduced_fraction->denominator_natural_number_.get_number() == 1;
 }

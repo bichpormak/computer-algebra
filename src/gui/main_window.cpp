@@ -1,5 +1,7 @@
 #include "main_window.h"
 
+#include "rational_number_window.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
@@ -57,7 +59,10 @@ void MainWindow::on_integers_clicked() {
 }
 
 void MainWindow::on_rational_numbers_clicked() {
-    QMessageBox::information(this, "Рациональные числа", "Вы нажали на кнопку Рациональные числа.");
+    RationalNumberWindow *rational_number_window = new RationalNumberWindow();
+    rational_number_window->setAttribute(Qt::WA_DeleteOnClose);
+    rational_number_window->setWindowFlags(Qt::Window);
+    rational_number_window->show();
 }
 
 void MainWindow::on_polynomials_clicked() {

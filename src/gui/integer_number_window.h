@@ -8,6 +8,10 @@
 #include <QGridLayout>
 #include <QApplication>
 #include <QScreen>
+#include <QMessageBox>
+
+
+#include "model/integer_numbers.h"
 
 
 class IntegerNumberWindow : public QWidget {

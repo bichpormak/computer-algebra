@@ -226,6 +226,31 @@ void NaturalNumberWindow::compare_clicked() {
 
 void NaturalNumberWindow::is_zero_clicked() {
 
+    bool ok1;
+    int64_t num1 = lineedit_first_number_->text().toLong(&ok1);
+
+    if (!ok1) {
+        QMessageBox::warning(this, "Ошибка ввода", "Пожалуйста, введите корректные натуральные числа");
+        return;
+    }
+
+    try {
+        NaturalNumber first_natural_number(num1);
+
+        bool result = first_natural_number.is_zero();
+
+        QString result_text;
+        if (result) {
+            result_text = "Да, число 0";
+        } else {
+            result_text = "Нет, число не 0";
+        }
+
+        lineedit_result_->setText(result_text);
+    } catch (const std::invalid_argument &e) {
+        QMessageBox::warning(this, "Ошибка", e.what());
+    }
+
 }
 
 void NaturalNumberWindow::add_one_clicked() {
@@ -328,10 +353,57 @@ void NaturalNumberWindow::subtract_with_multiply_digit_clicked() {
 
 void NaturalNumberWindow::get_first_digit_after_division_number_on_ten_in_power_clicked() {
 
+    bool ok1;
+    bool ok2;
+    bool ok3;
+    int64_t num1 = lineedit_first_number_->text().toLong(&ok1);
+    int64_t num2 = lineedit_second_number_->text().toLong(&ok2);
+    int64_t num3 = lineedit_digit_->text().toLong(&ok3);
+
+    if (!ok1 || !ok2 || !ok3) {
+        QMessageBox::warning(this, "Ошибка ввода", "Пожалуйста, введите корректное натуральное число и цифру");
+        return;
+    }
+
+    try {
+        NaturalNumber first_natural_number(num1);
+        NaturalNumber second_natural_number(num2);
+
+        std::unique_ptr<Number> result = first_natural_number.get_first_digit_after_division_number_on_ten_in_power(second_natural_number, num3);
+
+        QString result_text = QString::number(result->get_number());
+
+        lineedit_result_->setText(result_text);
+    } catch (const std::invalid_argument &e) {
+        QMessageBox::warning(this, "Ошибка", e.what());
+    }
+
 }
 
 void NaturalNumberWindow::division_numbers_with_remainder_clicked() {
 
+    bool ok1;
+    bool ok2;
+    int64_t num1 = lineedit_first_number_->text().toLong(&ok1);
+    int64_t num2 = lineedit_second_number_->text().toLong(&ok2);
+
+    if (!ok1) {
+        QMessageBox::warning(this, "Ошибка ввода", "Пожалуйста, введите корректное натуральное число и цифру");
+        return;
+    }
+
+    try {
+        NaturalNumber first_natural_number(num1);
+        NaturalNumber second_natural_number(num2);
+
+        std::unique_ptr<Number> result = first_natural_number.division_numbers_with_remainder(second_natural_number);
+
+        QString result_text = QString::number(result->get_number());
+
+        lineedit_result_->setText(result_text);
+    } catch (const std::invalid_argument &e) {
+        QMessageBox::warning(this, "Ошибка", e.what());
+    }
 }
 
 void NaturalNumberWindow::calculating_remainder_after_division_clicked() {

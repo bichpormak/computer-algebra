@@ -16,8 +16,9 @@ std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
     auto abs_other = other.get_absolute_value();      // Returns std::unique_ptr<NaturalNumber>
 
     if (sign1 == sign2) {
-        auto abs_sum = abs_this->add(*abs_other);     // Add absolute values
-        auto result = converting_natural_to_integer(*abs_sum);
+        // Both have the same sign
+        std::unique_ptr<NaturalNumber> abs_sum = abs_this->add(*abs_other);     // Add absolute values
+        std::unique_ptr<IntegerNumber> result = converting_natural_to_integer(*abs_sum);
         if (sign1 == 1) {
             // Negative result
             return result->change_sign();
@@ -25,14 +26,15 @@ std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
             return result;
         }
     } else {
+        // Different signs, perform subtraction
         uint8_t compare_result = abs_this->compare(*abs_other);
         if (compare_result == 0) {
             // Result is zero
             return std::make_unique<IntegerNumber>(0);
         } else if (compare_result == 2) {
             // abs_this > abs_other
-            auto abs_diff = abs_this->subtract(*abs_other);
-            auto result = converting_natural_to_integer(*abs_diff);
+            std::unique_ptr<NaturalNumber> abs_diff = abs_this->subtract(*abs_other);
+            std::unique_ptr<IntegerNumber> result = converting_natural_to_integer(*abs_diff);
             if (sign1 == 1) {
                 // Negative result
                 return result->change_sign();
@@ -41,8 +43,8 @@ std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
             }
         } else {
             // abs_other > abs_this
-            auto abs_diff = abs_other->subtract(*abs_this);
-            auto result = converting_natural_to_integer(*abs_diff);
+            std::unique_ptr<NaturalNumber> abs_diff = abs_other->subtract(*abs_this);
+            std::unique_ptr<IntegerNumber> result = converting_natural_to_integer(*abs_diff);
             if (sign2 == 1) {
                 // Negative result
                 return result->change_sign();
@@ -54,7 +56,7 @@ std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::subtract(IntegerNumber& other) const {
-    auto negated_other = other.change_sign();
+    std::unique_ptr<IntegerNumber> negated_other = other.change_sign();
     return this->add(*negated_other);
 }
 
@@ -62,17 +64,18 @@ std::unique_ptr<IntegerNumber> IntegerNumber::multiply(IntegerNumber& other) con
     auto abs_this = this->get_absolute_value();
     auto abs_other = other.get_absolute_value();
 
-    auto abs_result = abs_this->multiply(*abs_other);
+    std::unique_ptr<NaturalNumber> abs_result = abs_this->multiply(*abs_other);
 
     int8_t sign1 = this->is_number_positive();
     int8_t sign2 = other.is_number_positive();
 
-    auto result = converting_natural_to_integer(*abs_result);
+    std::unique_ptr<IntegerNumber> result = converting_natural_to_integer(*abs_result);
 
     if ((sign1 == 1 && sign2 == 2) || (sign1 == 2 && sign2 == 1)) {
         // Negative result
         return result->change_sign();
     } else {
+        // Positive result
         return result;
     }
 }
@@ -89,7 +92,7 @@ std::unique_ptr<IntegerNumber> IntegerNumber::change_sign() const {
     return std::make_unique<IntegerNumber>(-this->get_number());
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer(NaturalNumber& other) {
+std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer(NaturalNumber& other) const {
     return std::make_unique<IntegerNumber>(other.get_number());
 }
 
@@ -102,26 +105,32 @@ std::unique_ptr<NaturalNumber> IntegerNumber::converting_positive_integer_to_nat
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::calculating_quotient(IntegerNumber& other) const {
-    if (other.is_number_positive() == 0) {
+    if (other.get_number() == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
     }
 
     int8_t sign1 = this->is_number_positive();
     int8_t sign2 = other.is_number_positive();
 
-    auto abs_this = this->get_absolute_value();
-    auto abs_other = other.get_absolute_value();
+    // Determine the sign of the quotient
+    bool negative = (sign1 != sign2);
 
-    auto quotient = abs_this->division_numbers_with_remainder(*abs_other);
+    // Get absolute values
+    std::unique_ptr<NaturalNumber> abs_this = this->get_absolute_value();
+    std::unique_ptr<NaturalNumber> abs_other = other.get_absolute_value();
 
-    auto result = converting_natural_to_integer(*quotient);
+    // Perform division: abs_this / abs_other
+    std::unique_ptr<NaturalNumber> quotient_natural = abs_this->division_numbers_with_remainder(*abs_other);
 
-    if ((sign1 == 1 && sign2 == 2) || (sign1 == 2 && sign2 == 1)) {
-        // Negative result
-        return result->change_sign();
-    } else {
-        return result;
+    // Convert quotient to IntegerNumber
+    std::unique_ptr<IntegerNumber> quotient = converting_natural_to_integer(*quotient_natural);
+
+    // Set the correct sign
+    if (negative) {
+        quotient = quotient->change_sign();
     }
+
+    return quotient;
 }
 
 std::unique_ptr<IntegerNumber> IntegerNumber::calculating_remainder_after_division(IntegerNumber& other) const {
@@ -129,9 +138,9 @@ std::unique_ptr<IntegerNumber> IntegerNumber::calculating_remainder_after_divisi
         throw std::invalid_argument("Division by zero is not allowed.");
     }
 
-    auto quotient = this->calculating_quotient(other);
-    auto product = quotient->multiply(other);
-    auto remainder = this->subtract(*product);
+    std::unique_ptr<IntegerNumber> quotient = this->calculating_quotient(other);
+    std::unique_ptr<IntegerNumber> product = quotient->multiply(other);
+    std::unique_ptr<IntegerNumber> remainder = this->subtract(*product);
 
     return remainder;
 }

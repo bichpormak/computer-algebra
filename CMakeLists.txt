@@ -68,6 +68,8 @@ add_executable(computer-algebra-gui
         src/gui/integer_number_window.h
         src/gui/rational_number_window.cpp
         src/gui/rational_number_window.h
+        src/gui/fraction_input.cpp
+        src/gui/fraction_input.h
 )
 
 target_link_libraries(computer-algebra-gui PRIVATE computer_algebra_lib Qt6::Widgets)

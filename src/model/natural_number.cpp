@@ -10,10 +10,10 @@ std::unique_ptr<NaturalNumber> NaturalNumber::add(NaturalNumber &other) const {
         num1 = tmp;
     };
 
-    num1 = reverse_digits_in_vector(num1); // reversal of a larger number 
+    num1 = reverse_digits_in_vector(num1); // reversal of a larger number
     num2 = reverse_digits_in_vector(num2);
 
-    for (size_t k = 0; k < num2.size(); ++k){ 
+    for (size_t k = 0; k < num2.size(); ++k){
 
         num1[k] += num2[k]; // bitwise addition of digits
         if (num1[k] >= 10 && k + 1 < num1.size()){ // the result of adding is greater than 10. Moreover, this is not the maximum digit
@@ -26,10 +26,9 @@ std::unique_ptr<NaturalNumber> NaturalNumber::add(NaturalNumber &other) const {
         }
     }
 
-    num1 = reverse_digits_in_vector(num1); 
-    
+    num1 = reverse_digits_in_vector(num1);
+
     return std::make_unique<NaturalNumber>((gather_digits_into_number(num1)));
-    
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::subtract(NaturalNumber &other) const {
@@ -37,13 +36,13 @@ std::unique_ptr<NaturalNumber> NaturalNumber::subtract(NaturalNumber &other) con
     auto digits_first = reverse_digits_in_vector(this->get_digits_of_number());
     auto digits_second = reverse_digits_in_vector(other.get_digits_of_number());
 
-    if (this->compare(other) <= 1) {
+    if (this->compare(other) == 1) {
         throw std::invalid_argument("Первое число должно быть больше или равно второму!");
     }
 
     std::vector<uint8_t> result;
     int carry = 0; // Debt
-    for (size_t i = 0; i < digits_first.size(); ++i) { 
+    for (size_t i = 0; i < digits_first.size(); ++i) {
         int current = digits_first[i] - ( (i < digits_second.size() ) ? digits_second[i] : 0) - carry; // Result of the subtraction on the i-th step
         if (current < 0) {
             current += 10;
@@ -76,7 +75,6 @@ std::unique_ptr<NaturalNumber> NaturalNumber::multiply(NaturalNumber &other) con
 
     return result;
 }
-
 
 uint8_t NaturalNumber::compare(NaturalNumber &other) const {
 
@@ -194,87 +192,154 @@ std::unique_ptr<NaturalNumber> NaturalNumber::subtract_with_multiply_digit(Natur
     return result;
 }
 
-std::unique_ptr<NaturalNumber> NaturalNumber::get_first_digit_after_division_number_on_ten_in_power(int64_t power) const {
+std::unique_ptr<NaturalNumber> NaturalNumber::get_first_digit_after_division_number_on_ten_in_power(NaturalNumber& other, int64_t power) const {
+    if (other.is_zero()) {
+        throw std::invalid_argument("Деление на ноль!");
+    }
+
     if (power < 0) {
-        throw std::invalid_argument("Power must be non-negative");
+        throw std::invalid_argument("Степень должна быть неотрицательной!");
     }
 
-    // Create divisor = 10^power
-    auto divisor = std::make_unique<NaturalNumber>(1);
-    if (power > 0) {
-        divisor = divisor->multiply_by_ten_in_power(power);
+    // Создаем делитель: divisor = other * 10^power
+    auto divisor = other.multiply_by_ten_in_power(power);
+
+    // Если делимое меньше делителя, первая цифра частного — 0
+    if (this->compare(*divisor) == 1) { // this < divisor
+        return std::make_unique<NaturalNumber>(0);
     }
 
-    // Find the largest digit d (from 9 down to 1) such that d * divisor <= this
-    for (int d = 9; d >= 1; --d) {
-        // Multiply divisor by digit d
-        auto d_times_divisor = divisor->multiply_by_digit(d);
+    // Получаем цифры делимого и делителя
+    auto dividend_digits = this->get_digits_of_number();
+    auto divisor_digits = divisor->get_digits_of_number();
 
-        // Compare this number with d_times_divisor
-        uint8_t cmp_result = this->compare(*d_times_divisor);
+    size_t dividend_size = dividend_digits.size();
+    size_t divisor_size = divisor_digits.size();
 
-        if (cmp_result == 2 || cmp_result == 0) { // this >= d_times_divisor
-            return std::make_unique<NaturalNumber>(d);
-        }
+    // Извлекаем начальный сегмент делимого, соответствующий разрядам делителя
+    std::vector<uint8_t> initial_dividend_segment(dividend_digits.begin(), dividend_digits.begin() + divisor_size);
+
+    // Создаем число из начального сегмента
+    auto initial_dividend_number = std::make_unique<NaturalNumber>(gather_digits_into_number(initial_dividend_segment));
+
+    // Если начальный сегмент меньше делителя и есть дополнительные цифры, добавляем еще одну цифру
+    if (initial_dividend_number->compare(*divisor) == 1 && dividend_size > divisor_size) {
+        initial_dividend_segment.push_back(dividend_digits[divisor_size]);
+        initial_dividend_number = std::make_unique<NaturalNumber>(gather_digits_into_number(initial_dividend_segment));
     }
 
-    // If no such d found, return 0
-    return std::make_unique<NaturalNumber>(0);
+    // Инициализируем первую цифру частного
+    int first_digit = 0;
+
+    // Вычитаем делитель из начального сегмента делимого, чтобы найти первую цифру частного
+    while (initial_dividend_number->compare(*divisor) == 2 || initial_dividend_number->compare(*divisor) == 0) { // initial_dividend_number >= divisor
+        initial_dividend_number = initial_dividend_number->subtract(*divisor);
+        ++first_digit;
+    }
+
+    // Возвращаем первую цифру частного
+    return std::make_unique<NaturalNumber>(first_digit);
 }
 
+
+
 std::unique_ptr<NaturalNumber> NaturalNumber::division_numbers_with_remainder(NaturalNumber& other) const {
-
-    auto num1 = this->get_digits_of_number();
-    auto num2 = other.get_digits_of_number();
-
-    if (this->compare(other) == 1){ //finding a larger number
-        auto tmp = num2;
-        num2 = num1;
-        num1 = tmp;
+    if (other.is_zero()) {
+        throw std::invalid_argument("Деление на ноль!");
     }
 
-    int k = num1.size() - num2.size();
-    if (num1[0] < num2[0]){
-        k--;
+    if (this->compare(other) == 1) { // this < other
+        return std::make_unique<NaturalNumber>(0);
     }
 
-    std::unique_ptr<NaturalNumber> result = std::make_unique<NaturalNumber>(int(num1[0]) / int(num2[0]));
-    result->multiply_by_ten_in_power(k);
-    return result;
+    auto dividend_digits = this->get_digits_of_number();
+    auto divisor = other;
 
+    std::vector<uint8_t> quotient_digits;
+    size_t index = 0;
+    auto current = NaturalNumber(0);
+
+    while (index < dividend_digits.size()) {
+        current = *current.multiply_by_ten_in_power(1);
+        NaturalNumber temp_number(dividend_digits[index]);
+        current = *current.add(temp_number);
+
+        uint8_t d = 0;
+        for (int i = 9; i >= 1; --i) {
+            auto temp = divisor.multiply_by_digit(i);
+            if (temp->compare(current) <= 1) {
+                d = i;
+                break;
+            }
+        }
+        quotient_digits.push_back(d);
+
+        if (d != 0) {
+            auto temp = divisor.multiply_by_digit(d);
+            current = *current.subtract(*temp);
+        }
+
+        index++;
+    }
+
+    while (quotient_digits.size() > 1 && quotient_digits[0] == 0) {
+        quotient_digits.erase(quotient_digits.begin());
+    }
+
+    return std::make_unique<NaturalNumber>(gather_digits_into_number(quotient_digits));
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::calculating_remainder_after_division(NaturalNumber& other) const {
+    if (other.is_zero()) {
+        throw std::invalid_argument("Деление на ноль!");
+    }
 
-    std::unique_ptr<NaturalNumber> incomplete_quotient = division_numbers_with_remainder(other);
+    if (this->compare(other) == 1) { // this < other
+        return std::make_unique<NaturalNumber>(*this);
+    }
 
-    return subtract_with_multiply_digit(other, incomplete_quotient->get_number());
+    auto dividend_digits = this->get_digits_of_number();
+    auto divisor = other;
 
+    size_t index = 0;
+    auto current = NaturalNumber(0);
+
+    while (index < dividend_digits.size()) {
+        current = *current.multiply_by_ten_in_power(1);
+        NaturalNumber temp_number(dividend_digits[index]);
+        current = *current.add(temp_number);
+
+        uint8_t d = 0;
+        for (int i = 9; i >= 1; --i) {
+            auto temp = divisor.multiply_by_digit(i);
+            if (temp->compare(current) <= 1) {
+                d = i;
+                break;
+            }
+        }
+
+        if (d != 0) {
+            auto temp = divisor.multiply_by_digit(d);
+            current = *current.subtract(*temp);
+        }
+
+        index++;
+    }
+
+    return std::make_unique<NaturalNumber>(current);
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::calculate_gcd(NaturalNumber& other) const {
-
     auto firstNumber = *this;
     auto secondNumber = other;
 
     while (!secondNumber.is_zero()) {
-
         std::unique_ptr<NaturalNumber> remainder_ptr = firstNumber.calculating_remainder_after_division(secondNumber);
-        NaturalNumber* remainder = remainder_ptr.get();
-
-        if (firstNumber.compare(secondNumber) == 2) {
-            firstNumber = secondNumber;
-            secondNumber = *remainder;
-        } else if (firstNumber.compare(secondNumber) == 1) {
-            secondNumber = firstNumber;
-            firstNumber = *remainder;
-        } else {
-            break;
-        }
+        firstNumber = secondNumber;
+        secondNumber = *remainder_ptr;
     }
 
     return std::make_unique<NaturalNumber>(firstNumber);
-
 }
 
 std::unique_ptr<NaturalNumber> NaturalNumber::calculate_lcm(NaturalNumber& other) {

@@ -3,48 +3,54 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QGridLayout>
-#include <QMessageBox>
 #include <QScreen>
-#include <QApplication>
-#include <QLabel>
-#include <QLineEdit>
+#include <QGuiApplication>
+#include <QMessageBox>
+#include <QList>
+#include <memory>
 
-class RationalNumberWindow : public QWidget {
-//     Q_OBJECT
-//
-// public:
-//     RationalNumberWindow(QWidget *parent = Q_NULLPTR);
-//
-// private slots:
-//     void add_clicked();
-//     void subtract_clicked();
-//     void multiply_clicked();
-//     void divide_clicked();
-//     void convert_integer_to_fraction();
-//     void convert_reduced_fraction_to_integer();
-//     void reduce_fraction();
-//     void is_reduced();
-//
-// private:
-//     QPushButton *add_;
-//     QPushButton *subtract_;
-//     QPushButton *multiply_;
-//     QPushButton *divide_;
-//     QPushButton *convert_integer_to_fraction_;
-//     QPushButton *convert_reduced_fraction_to_fraction_;
-//     QPushButton *reduce_fraction_;
-//     QGridLayout *is_reduced_;
-//
-//     QLabel *label_first_number_;
-//     QLabel *label_second_number_;
-//     QLabel *label_result_;
-//
-//     QLineEdit *lineedit_first_number_;
-//     QLineEdit *lineedit_second_number_;
-//     QLineEdit *lineedit_result_;
+#include "fraction_input.h"
+#include "model/rational_numbers.h"
+
+class RationalNumberWindow : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit RationalNumberWindow(QWidget *parent = nullptr);
+
+private slots:
+    void add_clicked();
+    void subtract_clicked();
+    void multiply_clicked();
+    void divide_clicked();
+    void convert_integer_to_fraction_clicked();
+    void convert_reduced_fraction_to_integer_clicked();
+    void reduce_fraction_clicked();
+    void is_integer_clicked();
+
+private:
+    void performBinaryOperation(
+        std::function<std::unique_ptr<RationalNumber>(RationalNumber&, RationalNumber&)> operation);
+    void performUnaryOperation(
+        std::function<std::unique_ptr<RationalNumber>(RationalNumber&)> operation);
+    void performUnaryOperationInteger(
+        std::function<std::unique_ptr<IntegerNumber>(RationalNumber&)> operation);
+
+    FractionInput *fraction_input1_;
+    FractionInput *fraction_input2_;
+    FractionInput *fraction_result_;
+
+    QPushButton *add_;
+    QPushButton *subtract_;
+    QPushButton *multiply_;
+    QPushButton *divide_;
+    QPushButton *convert_integer_to_fraction_;
+    QPushButton *convert_reduced_fraction_to_integer_;
+    QPushButton *reduce_fraction_;
+    QPushButton *is_integer_;
 };
 
-
-
-#endif
+#endif // RATIONAL_NUMBER_WINDOW_H
