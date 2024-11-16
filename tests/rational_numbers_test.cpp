@@ -73,7 +73,7 @@ TEST_F(RationalNumberTest, reduce_fraction) {
 TEST_F(RationalNumberTest, is_integer) {
     EXPECT_TRUE(rational_two_->is_integer());
 
-    // EXPECT_FALSE(rational_one_half_->is_integer());
+    EXPECT_FALSE(rational_one_half_->is_integer());
 
-    // EXPECT_TRUE(rational_zero_->is_integer());
+    EXPECT_TRUE(rational_zero_->is_integer());
 }
