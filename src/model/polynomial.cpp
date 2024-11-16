@@ -1,43 +1,41 @@
-#include "polynomial.h"
+include "polynomail.h"
+include "rational_numbers.h"
+include "natural_numbers.h"
+include "integer_numbers.h"
 
-    std::unique_ptr<Polynomial> multiply_by_rational(const RationalNumber& scalar) const {
-    for (const auto& [key, value] : coefficients_) {
-        auto new_coefficient = std::make_unique<RationalNumber>(*value * scalar);
-        
-        if (new_coefficient != 0) {
-            new_coefficients[std::make_unique<NaturalNumber>(*key)] = std::move(new_coefficient);
+typedef void (NaturalNumber::*MethodPtr)(NaturalNumber&);
+
+int callMethod(MethodPtr method, NaturalNumber& value) {
+    return (this->*method)(value);
+}
+
+int func_of_list(std::vector<int>& numbers, MethodPtr method) {
+    if (numbers.empty()) {
+        return 0;
+    }
+    int current_func = numbers[0];
+    for (size_t i = 1; i < numbers.size(); ++i) {
+        current_func = callMethod(method, numbers[i]);
+        if (current_func == 1 && method == &NaturalNumber::calculate_gcd) {
+            break;
         }
     }
+    return current_func;
+}
 
-    return std::make_unique<Polynomial>(new_coefficients);
+void normalize(){
+    std::vector<int> numerators;
+    std::vector<int> denominators;
+
+    for (const auto& pair : coefficients_) {
+            numerators.push_back(std::get_absolute_value(std::make_unique<IntegerNumber>(*pair.second).numerator)->converting_positive_integer_to_natural);
+            denominators.push_back(std::make_unique<NaturalNumber>(*pair.second).denominator);
     }
 
+    gcd_ = func_of_list(numerators, &NaturalNumber::calculate_gcd) 
+    lcm_ = func_of_list(denominators, &NaturalNumber::calculate_lcm);
 
-    std::unique_ptr<Polynomial> multiply_by_x_power(int k) const {
-
-    for (const auto& [key, value] : coefficients_) {
-        auto new_key = std::make_unique<NaturalNumber>(*key + k);
-        new_coefficients[std::move(new_key)] = std::make_unique<RationalNumber>(*value);
+    for (const auto& pair : coefficients_) {
+        this->coefficients_[pair.first] = std::make_unique<RationalNumber>((std::make_unique<IntegerNumber>(*pair.second).numerator / gcd_) * (lcm_ /  std::make_unique<NaturalNumber>(*pair.second).denominator), lcm_);
     }
-    
-    return std::make_unique<Polynomial>(new_coefficients);
-    }
-
-
-    static std::unique_ptr<Polynomial> gcd(const Polynomial& p1, const Polynomial& p2){
-
-    if (p1.coefficients_.empty() && p2.coefficients_.empty()) {
-        return std::make_unique<Polynomial>();
-    }
-
-    if (p1.coefficients_.empty()) {
-        return std::make_unique<Polynomial>(p2);
-    }
-    if (p2.coefficients_.empty()) {
-        return std::make_unique<Polynomial>(p1);
-    }
-
-    std::unique_ptr<Polynomial> remainder = p1.remainder(p2);
-    return gcd(p2, *remainder);
-    }
-
+}
