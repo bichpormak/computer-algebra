@@ -30,7 +30,7 @@ PolynomialWindow::PolynomialWindow(QWidget *parent)
     multiply_by_x_power_ = new QPushButton("Умножение на x^k", this);
     leading_coefficient_ = new QPushButton("Старший коэффициент", this);
     degree_ = new QPushButton("Старшая степень", this);
-    normalize_ = new QPushButton("Деление на старший коэффициент", this);
+    normalize_ = new QPushButton("Вынесение НОД числителей и НОК знаменателей", this);
     remainder_clicked_ = new QPushButton("Остаток", this);
     gcd_ = new QPushButton("НОД", this);
 

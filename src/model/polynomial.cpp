@@ -67,36 +67,62 @@ std::unique_ptr<Polynomial> Polynomial::fromString(const std::string &input) {
         std::smatch match = *i;
         std::string term = match[1].str();
 
-        std::regex singleTermRegex(R"(([+-]?\d*)x(?:\^(\d+))?|([+-]?\d+))");
+        // Обновлённый регексп для распознавания рациональных коэффициентов
+        std::regex singleTermRegex(R"(([+-]?(\d+/\d+|\d+))x(?:\^(\d+))?|([+-]?\d+))");
         std::smatch termMatch;
         if (std::regex_match(term, termMatch, singleTermRegex)) {
-            int coeff = 0;
+            RationalNumber coeff;
             int degree = 0;
 
             if (termMatch[1].matched) { // Термин с x
                 std::string coeffStr = termMatch[1].str();
-                coeff = 1; // Коэффициент по умолчанию
-                if (coeffStr == "-" ) {
-                    coeff = -1;
-                } else if (coeffStr != "+" && !coeffStr.empty()) {
-                    coeff = std::stoi(coeffStr);
+
+                // Парсинг рационального числа
+                std::regex fractionRegex(R"(([+-]?\d+)/(\d+))");
+                std::smatch fracMatch;
+                if (std::regex_match(coeffStr, fracMatch, fractionRegex)) {
+                    int numerator = std::stoi(fracMatch[1].str());
+                    int denominator = std::stoi(fracMatch[2].str());
+                    if (denominator == 0) {
+                        throw std::invalid_argument("Знаменатель не может быть равен нулю.");
+                    }
+                    coeff = RationalNumber{IntegerNumber(numerator), NaturalNumber(denominator)};
+                }
+                else { // Целое число
+                    int numerator = std::stoi(coeffStr);
+                    coeff = RationalNumber{IntegerNumber(numerator), NaturalNumber(1)};
                 }
 
-                if (termMatch[2].matched) { // Есть степень
-                    degree = std::stoi(termMatch[2].str());
+                if (termMatch[3].matched) { // Есть степень
+                    degree = std::stoi(termMatch[3].str());
                 } else {
                     degree = 1;
                 }
-            } else if (termMatch[3].matched) { // Постоянный термин
-                coeff = std::stoi(termMatch[3].str());
+            } else if (termMatch[4].matched) { // Постоянный термин
+                std::string constStr = termMatch[4].str();
+                // Парсинг рационального числа
+                std::regex fractionRegex(R"(([+-]?\d+)/(\d+))");
+                std::smatch fracMatch;
+                if (std::regex_match(constStr, fracMatch, fractionRegex)) {
+                    int numerator = std::stoi(fracMatch[1].str());
+                    int denominator = std::stoi(fracMatch[2].str());
+                    if (denominator == 0) {
+                        throw std::invalid_argument("Знаменатель не может быть равен нулю.");
+                    }
+                    coeff = RationalNumber{IntegerNumber(numerator), NaturalNumber(denominator)};
+                }
+                else { // Целое число
+                    int numerator = std::stoi(constStr);
+                    coeff = RationalNumber{IntegerNumber(numerator), NaturalNumber(1)};
+                }
                 degree = 0;
             }
 
             // Добавляем или обновляем коэффициент для степени
             if (coefficients.find(degree) != coefficients.end()) {
-                coefficients[degree] = coefficients[degree] + RationalNumber(IntegerNumber(coeff), NaturalNumber(1));
+                coefficients[degree] = coefficients[degree] + coeff;
             } else {
-                coefficients[degree] = RationalNumber(IntegerNumber(coeff), NaturalNumber(1));
+                coefficients[degree] = coeff;
             }
         } else {
             throw std::invalid_argument("Неверный формат термина: " + term);
@@ -244,7 +270,7 @@ std::unique_ptr<Polynomial> Polynomial::divide(const Polynomial& divisor, std::u
             quotient->coefficients_[deg_diff] = coeff_ratio;
         }
 
-        // Вычитание произведения делителя и одночлена из делимого
+        // Вычитание (divisor * monomial) из делимого
         auto product = divisor.multiply(monomial);
         dividend = *dividend.subtract(*product);
     }
