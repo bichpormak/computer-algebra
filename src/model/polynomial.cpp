@@ -1,7 +1,110 @@
 #include "polynomial.h"
 #include <stdexcept>
+#include <sstream>
+#include <regex>
 
+std::string Polynomial::toString() const {
+    if (coefficients_.empty()) {
+        return "0";
+    }
 
+    std::ostringstream oss;
+    bool first = true;
+
+    // Итерация от наивысшей степени к наименьшей
+    for(auto it = coefficients_.rbegin(); it != coefficients_.rend(); ++it) {
+        int degree = it->first;
+        const RationalNumber &coeff = it->second;
+
+        // Получаем числитель и знаменатель
+        int num = coeff.get_numerator().get_number();
+        int den = coeff.get_denominator().get_number();
+
+        if (num == 0) continue;
+
+        // Обработка знака
+        if (num > 0 && !first) {
+            oss << "+";
+        }
+
+        // Обработка коэффициента
+        bool coeffIsOne = (num == 1) && (den == 1);
+        bool coeffIsMinusOne = (num == -1) && (den == 1);
+
+        if (degree == 0 || !(coeffIsOne || coeffIsMinusOne)) {
+            // Если это дробь
+            if (den != 1) {
+                oss << num << "/" << den;
+            } else {
+                oss << num;
+            }
+        } else if (coeffIsMinusOne) {
+            oss << "-";
+        }
+
+        // Обработка переменной и степени
+        if (degree > 0) {
+            oss << "x";
+            if (degree > 1) {
+                oss << "^" << degree;
+            }
+        }
+
+        first = false;
+    }
+
+    return oss.str();
+}
+
+// Реализация статического метода fromString
+std::unique_ptr<Polynomial> Polynomial::fromString(const std::string &input) {
+    std::map<int, RationalNumber> coefficients;
+    std::regex termRegex(R"(([+-]?[^-+]+))"); // Разделяем по + и -, но сохраняем знак
+    std::sregex_iterator termsBegin(input.begin(), input.end(), termRegex);
+    std::sregex_iterator termsEnd;
+
+    for (std::sregex_iterator i = termsBegin; i != termsEnd; ++i) {
+        std::smatch match = *i;
+        std::string term = match[1].str();
+
+        std::regex singleTermRegex(R"(([+-]?\d*)x(?:\^(\d+))?|([+-]?\d+))");
+        std::smatch termMatch;
+        if (std::regex_match(term, termMatch, singleTermRegex)) {
+            int coeff = 0;
+            int degree = 0;
+
+            if (termMatch[1].matched) { // Термин с x
+                std::string coeffStr = termMatch[1].str();
+                coeff = 1; // Коэффициент по умолчанию
+                if (coeffStr == "-" ) {
+                    coeff = -1;
+                } else if (coeffStr != "+" && !coeffStr.empty()) {
+                    coeff = std::stoi(coeffStr);
+                }
+
+                if (termMatch[2].matched) { // Есть степень
+                    degree = std::stoi(termMatch[2].str());
+                } else {
+                    degree = 1;
+                }
+            } else if (termMatch[3].matched) { // Постоянный термин
+                coeff = std::stoi(termMatch[3].str());
+                degree = 0;
+            }
+
+            // Добавляем или обновляем коэффициент для степени
+            if (coefficients.find(degree) != coefficients.end()) {
+                coefficients[degree] = coefficients[degree] + RationalNumber(IntegerNumber(coeff), NaturalNumber(1));
+            } else {
+                coefficients[degree] = RationalNumber(IntegerNumber(coeff), NaturalNumber(1));
+            }
+        } else {
+            throw std::invalid_argument("Неверный формат термина: " + term);
+        }
+    }
+
+    return std::make_unique<Polynomial>(coefficients);
+}
 // Add two polynomials
 std::unique_ptr<Polynomial> Polynomial::add(const Polynomial& other) const {
     auto result = std::make_unique<Polynomial>(coefficients_);
@@ -115,7 +218,7 @@ std::unique_ptr<Polynomial> Polynomial::derivative() const {
 // Divide this polynomial by another, returning the quotient and setting the remainder
 std::unique_ptr<Polynomial> Polynomial::divide(const Polynomial& divisor, std::unique_ptr<Polynomial>& remainder) const {
     if (divisor.coefficients_.empty()) {
-        throw std::invalid_argument("Division by zero polynomial");
+        throw std::invalid_argument("Деление на нулевой многочлен невозможно.");
     }
 
     Polynomial dividend(*this);
@@ -123,28 +226,32 @@ std::unique_ptr<Polynomial> Polynomial::divide(const Polynomial& divisor, std::u
 
     while (!dividend.coefficients_.empty() && dividend.degree() >= divisor.degree()) {
         int deg_diff = dividend.degree() - divisor.degree();
-        // Assuming RationalNumber has operator/ overloaded
-        RationalNumber coeff_ratio = dividend.leading_coefficient() / divisor.leading_coefficient();
+        const RationalNumber& dividend_leading = dividend.leading_coefficient();
+        const RationalNumber& divisor_leading = divisor.leading_coefficient();
 
-        // Create a monomial: coeff_ratio * x^deg_diff
+        // Деление коэффициентов
+        RationalNumber coeff_ratio = dividend_leading / divisor_leading;
+
+        // Создание одночлена: coeff_ratio * x^deg_diff
         std::map<int, RationalNumber> monomial_coeffs;
         monomial_coeffs[deg_diff] = coeff_ratio;
         Polynomial monomial(monomial_coeffs);
 
-        // Add monomial to quotient
+        // Добавление одночлена к частному
         if (quotient->coefficients_.find(deg_diff) != quotient->coefficients_.end()) {
             quotient->coefficients_[deg_diff] = quotient->coefficients_[deg_diff] + coeff_ratio;
         } else {
             quotient->coefficients_[deg_diff] = coeff_ratio;
         }
 
-        // Subtract (divisor * monomial) from dividend
+        // Вычитание произведения делителя и одночлена из делимого
         auto product = divisor.multiply(monomial);
         dividend = *dividend.subtract(*product);
     }
 
     quotient->normalize();
     remainder = std::make_unique<Polynomial>(dividend);
+    remainder->normalize();
     return quotient;
 }
 

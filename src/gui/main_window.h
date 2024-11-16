@@ -10,7 +10,8 @@
 
 #include "natural_number_window.h"
 #include "integer_number_window.h"
-
+#include "rational_number_window.h"
+#include "polynomial_window.h"
 
 class MainWindow : public QWidget {
     Q_OBJECT

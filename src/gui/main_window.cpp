@@ -1,6 +1,5 @@
 #include "main_window.h"
 
-#include "rational_number_window.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -66,5 +65,8 @@ void MainWindow::on_rational_numbers_clicked() {
 }
 
 void MainWindow::on_polynomials_clicked() {
-    QMessageBox::information(this, "Многочлены", "Вы нажали на кнопку Многочлены.");
+    PolynomialWindow *polynomial_window = new PolynomialWindow();
+    polynomial_window->setAttribute(Qt::WA_DeleteOnClose);
+    polynomial_window->setWindowFlags(Qt::Window);
+    polynomial_window->show();
 }

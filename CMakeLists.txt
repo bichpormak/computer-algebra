@@ -70,6 +70,10 @@ add_executable(computer-algebra-gui
         src/gui/rational_number_window.h
         src/gui/fraction_input.cpp
         src/gui/fraction_input.h
+        src/gui/polynomial_window.cpp
+        src/gui/polynomial_window.h
+        src/gui/polynomial_input.cpp
+        src/gui/polynomial_input.h
 )
 
 target_link_libraries(computer-algebra-gui PRIVATE computer_algebra_lib Qt6::Widgets)

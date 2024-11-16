@@ -49,6 +49,12 @@ public:
     static std::unique_ptr<Polynomial> gcd(const Polynomial& p1, const Polynomial& p2);
     std::unique_ptr<Polynomial> derivative() const;
     std::unique_ptr<Polynomial> simplify_roots() const;
+
+    static std::unique_ptr<Polynomial> fromString(const std::string &input);
+    std::string toString() const;
+    std::map<int, RationalNumber> getCoefficients() { return coefficients_; }
+
+
 };
 
 #endif
