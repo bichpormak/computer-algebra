@@ -18,6 +18,10 @@ public:
     Polynomial(std::map<int, RationalNumber>&& coefficients)
             : coefficients_(std::move(coefficients)) {}
 
+    Polynomial(const std::map<int, RationalNumber>& coeffs)
+    : coefficients_(coeffs) {}
+
+
     Polynomial& operator=(const Polynomial& other) {
         if (this != &other) {
             coefficients_ = other.coefficients_;

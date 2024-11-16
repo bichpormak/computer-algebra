@@ -49,6 +49,9 @@ public:
 public:
     std::unique_ptr<IntegerNumber> get_integer() { return std::make_unique<IntegerNumber>(numerator_integer_number_); };
     std::unique_ptr<NaturalNumber> get_natural() { return std::make_unique<NaturalNumber>(denominator_natural_number_); };
+
+    const IntegerNumber& get_numerator() const { return numerator_integer_number_; }
+    const NaturalNumber& get_denominator() const { return denominator_natural_number_; }
 };
 
 
