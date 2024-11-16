@@ -28,7 +28,7 @@ void normalize(){
     std::vector<int> denominators;
 
     for (const auto& pair : coefficients_) {
-            numerators.push_back(std::get_absolute_value(make_unique<IntegerNumber>(*pair.second).numerator)->converting_positive_integer_to_natural);
+            numerators.push_back(std::get_absolute_value(std::make_unique<IntegerNumber>(*pair.second).numerator)->converting_positive_integer_to_natural);
             denominators.push_back(std::make_unique<NaturalNumber>(*pair.second).denominator);
     }
 
@@ -36,7 +36,6 @@ void normalize(){
     lcm_ = func_of_list(denominators, &NaturalNumber::calculate_lcm);
 
     for (const auto& pair : coefficients_) {
-        this->coefficients_[pair.first] = std::make_unique<RationalNumber>(std::make_unique<IntegerNumber>(*pair.second).numerator / gcd_,  std::make_unique<NaturalNumber>(*pair.second).denominator * lcm_);
+        this->coefficients_[pair.first] = std::make_unique<RationalNumber>(std::make_unique<IntegerNumber>(*pair.second).numerator / gcd_,  std::make_unique<NaturalNumber>(*pair.second).denominator / lcm_);
     }
 }
-
