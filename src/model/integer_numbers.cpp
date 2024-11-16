@@ -1,14 +1,14 @@
 // integer_numbers.cpp
 #include "integer_numbers.h"
 
-int8_t IntegerNumber::is_number_positive() const {
+int8_t IntegerNumber::is_number_positive() const { // POZ_Z_D Аненков Иван
     if (this->get_number() == 0) {
         return 0;
     }
     return (this->get_sign() == SignNumber::POSITIVE) ? 2 : 1;
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
+std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const { // ADD_ZZ_Z Аненков Иван
     int8_t sign1 = this->is_number_positive();
     int8_t sign2 = other.is_number_positive();
 
@@ -53,12 +53,12 @@ std::unique_ptr<IntegerNumber> IntegerNumber::add(IntegerNumber& other) const {
     }
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::subtract(IntegerNumber& other) const {
+std::unique_ptr<IntegerNumber> IntegerNumber::subtract(IntegerNumber& other) const { // SUB_ZZ_Z Аненков Иван
     auto negated_other = other.change_sign();
     return this->add(*negated_other);
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::multiply(IntegerNumber& other) const {
+std::unique_ptr<IntegerNumber> IntegerNumber::multiply(IntegerNumber& other) const { // MUL_ZZ_Z Аненков Иван
     auto abs_this = this->get_absolute_value();
     auto abs_other = other.get_absolute_value();
 
@@ -77,7 +77,7 @@ std::unique_ptr<IntegerNumber> IntegerNumber::multiply(IntegerNumber& other) con
     }
 }
 
-std::unique_ptr<NaturalNumber> IntegerNumber::get_absolute_value() const {
+std::unique_ptr<NaturalNumber> IntegerNumber::get_absolute_value() const { // ABS_Z_Z Черныш Максим
     int64_t value = this->get_number();
     if (value < 0) {
         value = -value;
@@ -85,15 +85,15 @@ std::unique_ptr<NaturalNumber> IntegerNumber::get_absolute_value() const {
     return std::make_unique<NaturalNumber>(value);
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::change_sign() const {
+std::unique_ptr<IntegerNumber> IntegerNumber::change_sign() const { // MUL_ZM_Z Беляев Максим 
     return std::make_unique<IntegerNumber>(-this->get_number());
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer(NaturalNumber& other) {
+std::unique_ptr<IntegerNumber> IntegerNumber::converting_natural_to_integer(NaturalNumber& other) { // TRANS_N_Z Черныш Максим
     return std::make_unique<IntegerNumber>(other.get_number());
 }
 
-std::unique_ptr<NaturalNumber> IntegerNumber::converting_positive_integer_to_natural() const {
+std::unique_ptr<NaturalNumber> IntegerNumber::converting_positive_integer_to_natural() const { // TRANS_Z_N Земерова Светлана
     if (this->is_number_positive() == 2) {
         return std::make_unique<NaturalNumber>(this->get_number());
     } else {
@@ -101,7 +101,7 @@ std::unique_ptr<NaturalNumber> IntegerNumber::converting_positive_integer_to_nat
     }
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::calculating_quotient(IntegerNumber& other) const {
+std::unique_ptr<IntegerNumber> IntegerNumber::calculating_quotient(IntegerNumber& other) const { // DIV_ZZ_Z Лысиков Михаил
     if (other.is_number_positive() == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
     }
@@ -124,7 +124,7 @@ std::unique_ptr<IntegerNumber> IntegerNumber::calculating_quotient(IntegerNumber
     }
 }
 
-std::unique_ptr<IntegerNumber> IntegerNumber::calculating_remainder_after_division(IntegerNumber& other) const {
+std::unique_ptr<IntegerNumber> IntegerNumber::calculating_remainder_after_division(IntegerNumber& other) const { // MOD_ZZ_Z Земерова Светлана
     if (other.is_number_positive() == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
     }

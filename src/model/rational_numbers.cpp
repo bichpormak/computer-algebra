@@ -1,16 +1,16 @@
 #include "rational_numbers.h"
 
-std::unique_ptr<RationalNumber> RationalNumber::add(RationalNumber &other) const {
+std::unique_ptr<RationalNumber> RationalNumber::add(RationalNumber &other) const { // ADD_QQ_Q Абдусаламов Рустам
 
     return nullptr;
 }
 
-std::unique_ptr<RationalNumber> RationalNumber::subtract(RationalNumber &other) const {
+std::unique_ptr<RationalNumber> RationalNumber::subtract(RationalNumber &other) const { // SUB_QQ_Q Абдусаламов Рустам
 
     return nullptr;
 }
 
-std::unique_ptr<RationalNumber> RationalNumber::multiply(RationalNumber &other) const {
+std::unique_ptr<RationalNumber> RationalNumber::multiply(RationalNumber &other) const { // MUL_QQ_Q Беляев Максим
     auto numerator1 = this->numerator_integer_number_;
     auto numenator2 = other.numerator_integer_number_;
 
@@ -23,7 +23,7 @@ std::unique_ptr<RationalNumber> RationalNumber::multiply(RationalNumber &other) 
     return std::make_unique<RationalNumber>(RationalNumber(result_numerator->get_number(), result_denominator->get_number()));
 }
 
-std::unique_ptr<RationalNumber> RationalNumber::divide(RationalNumber& other) const {
+std::unique_ptr<RationalNumber> RationalNumber::divide(RationalNumber& other) const { // DIV_QQ_Q Алиев Вусал
     if (other.numerator_integer_number_.get_number() == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
     }
@@ -41,12 +41,12 @@ std::unique_ptr<RationalNumber> RationalNumber::divide(RationalNumber& other) co
     return std::make_unique<RationalNumber>(RationalNumber(result_numerator->get_number(), result_denominator->get_number()));
 }
 
-std::unique_ptr<RationalNumber> RationalNumber::convert_integer_to_fraction(IntegerNumber& other) const {
+std::unique_ptr<RationalNumber> RationalNumber::convert_integer_to_fraction(IntegerNumber& other) const { // TRANS_Z_Q Алиев Вусал 
     
     return std::make_unique<RationalNumber>(RationalNumber(other, NaturalNumber(1)));
 }
 
-std::unique_ptr<IntegerNumber> RationalNumber::convert_reduced_fraction_to_integer() const {
+std::unique_ptr<IntegerNumber> RationalNumber::convert_reduced_fraction_to_integer() const { // TRANS_Q_Z Лысиков Михаил  
     if (this->is_integer()){
         return std::make_unique<IntegerNumber>(this->numerator_integer_number_);
     }
@@ -55,11 +55,11 @@ std::unique_ptr<IntegerNumber> RationalNumber::convert_reduced_fraction_to_integ
     }
 }
 
-std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const {
+std::unique_ptr<RationalNumber> RationalNumber::reduce_fraction() const { // RED_Q_Q Черныш Максим
     return nullptr;
 }
 
-bool RationalNumber::is_integer() const {
+bool RationalNumber::is_integer() const { // INT_Q_B Зайцев Владислав 
     auto reduced_fraction = this->reduce_fraction();
     if (reduced_fraction->denominator_natural_number_.get_number() == 1){
         return true;
